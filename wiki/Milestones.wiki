@@ -1,10 +1,9 @@
-
-====  First milestone =====
+= First milestone = (12/15/2009)
    
   * Front-end terminal on the client side;
   * Investigate the matlab syntax checker on the server side;
 
-= Deliverables: =
+== Deliverables: ==
 
   * Terminal can type commands, server can repeat the commands;   
   * Finalize the design for the syntax checker;
