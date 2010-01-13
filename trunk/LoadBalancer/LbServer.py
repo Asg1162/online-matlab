@@ -1,20 +1,37 @@
 import sys, threading, Ice, Matcloud
 
-# DirectoryI servant class ...
+# BackendI servant class ...
 class BackendI(Matcloud.Backend):
     # Constructor and operations here...
     _adapter = None
-#    def __init__(self, name, parent):
     def __init__(self, hosts):
-        self._hosts = hosts;
-#        self._name = name
-#        self._parent = parent
-#        self._contents = []
-        # Create an identity. The
-        # parent has the fixed identity "RootDir"
-        #
-        myID = Ice.Identity();
+        self._hosts = hosts
+
+        myID = Ice.Identity()
         myID.name = "Backend"
+        # Add the identity to the object adapter
+        self._adapter.add(self, myID)
+        # Create a proxy for the new node and
+        # add it as a child to the parent
+        #
+        thisNode = Matcloud.BackendPrx.uncheckedCast(self._adapter.createProxy(myID))
+                
+    def addNode(self, newnode, current=None):
+        print "add user"
+        self._hosts.append(newnode)
+    
+    def delNode(self, obsnode, current=None):
+        self._hosts.remove(obsnode)
+
+# BackendI servant class ...
+class QueryI(Matcloud.Query):
+    # Constructor and operations here...
+    _adapter = None
+    def __init__(self, hosts):
+        self._hosts = hosts
+
+        myID = Ice.Identity();
+        myID.name = "Query"
         # Add the identity to the object adapter
         #
         self._adapter.add(self, myID)
@@ -23,13 +40,9 @@ class BackendI(Matcloud.Backend):
         #
         thisNode = Matcloud.BackendPrx.uncheckedCast(self._adapter.createProxy(myID))
                 
-    def addNode(self, newnode, current=None):
-        print "add user\n"
-        self._hosts.append(newnode)
+    def queryNbNodes(self, current=None):
+        return len(self._hosts)
     
-    def delNode(self, obsnode, current=None):
-        self._hosts.remove(obsnode)
-
 
 class Server(Ice.Application):
     def run(self, args):
@@ -43,9 +56,11 @@ class Server(Ice.Application):
                      createObjectAdapterWithEndpoints(
                          "LoadBalancer", "tcp -p 10000")
         BackendI._adapter = adapter
+        QueryI._adapter = adapter
         self._hosts = []
         # create the backend
         be = BackendI(self._hosts)
+        qu = QueryI(self._hosts)
         
         # Create the root directory (with name "/" and no parent)
         #
