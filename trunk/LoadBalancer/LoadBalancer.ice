@@ -15,8 +15,8 @@ module Matcloud {
             StrArray queryCluster();*/
             int queryNbNodes();
        };
-/*       interface Frontend {
-                 void newCmd(string);
-       };*/
+       interface Frontend {
+                 string FrontendAgent(string cmd);
+       };
 
 };
