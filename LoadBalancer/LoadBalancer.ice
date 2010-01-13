@@ -10,10 +10,11 @@ module Matcloud {
                  void delNode(string obsnode);
        };
 
-/*       interface Query {
-            StrArray queryUser();
-            StrArray queryCluster();
-       };*/
+       interface Query {
+/*            StrArray queryUser();
+            StrArray queryCluster();*/
+            int queryNbNodes();
+       };
 /*       interface Frontend {
                  void newCmd(string);
        };*/
