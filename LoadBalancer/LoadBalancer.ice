@@ -5,20 +5,30 @@ module Matcloud {
 
        enum QueryCmd { QueryUser, QueryCluster}; 
 
-       interface Backend {
-                 void addNode(string newnode);
-                 void delNode(string obsnode);
-       };
-
+       /* load balancer (server), query tools (client) */
        interface Query {
 /*            StrArray queryUser();
             StrArray queryCluster();*/
             int queryNbNodes();
        };
+
+       /* load balancer(server), web server(client) */
        interface Frontend {
                  string FrontendAgent(string cmd);
 				 string FrontendLogin(string uname);
 				 string FrontendLogout(string uname);
+       };
+
+
+       /* load balancer(server), backend(client) */
+       interface Backend {
+                 void addNode(string newnode);
+                 void delNode(string obsnode);
+       };
+
+       /* backend (server), load balancer(client) */
+       interface Parser {
+                 string command(string cmd);
        };
 
 };

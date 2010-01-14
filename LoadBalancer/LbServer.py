@@ -21,6 +21,7 @@ class BackendI(Matcloud.Backend):
         self._hosts.append(newnode)
     
     def delNode(self, obsnode, current=None):
+        # TODO can't remove brutally need to check if it's idle
         self._hosts.remove(obsnode)
 
 # BackendI servant class ...
@@ -64,37 +65,35 @@ class FrontendI(Matcloud.Frontend):
     def FrontendAgent(self, cmd, current=None):
         print "received command %s" % cmd;
 		try:
-				ic = Ice.initialize(sys.argv)
-				bebase = ic.stringToProxy("Parser:tcp -h os40.csc.ncsu.edu -p 10001")
-				parser = Matcloud.ParserPrx.checkedCast(bebase)
-				if not parser:
-						raise RuntimeError("Invalid proxy")
-				parser.("os40.csc.ncsu.edu")
+                    ic = Ice.initialize(sys.argv)
+                    bebase = ic.stringToProxy("Parser:tcp -h os40.csc.ncsu.edu -p 10001")
+                    parser = Matcloud.ParserPrx.checkedCast(bebase)
+                    if not parser:
+                        raise RuntimeError("Invalid proxy")
+                    parser.("os40.csc.ncsu.edu")
 
-				qebase = ic.stringToProxy("Query:tcp -h os56.csc.ncsu.edu -p 10000")
-				query = Matcloud.QueryPrx.checkedCast(qebase)
-				nbNode = query.queryNbNodes()
-
-				print "there are %d node" % nbNode
-
+                    qebase = ic.stringToProxy("Query:tcp -h os56.csc.ncsu.edu -p 10000")
+                    query = Matcloud.QueryPrx.checkedCast(qebase)
+                    nbNode = query.queryNbNodes()
+                    print "there are %d node" % nbNode
 		except:
-				traceback.print_exc()
-				status = 1
-				if ic:
-						try:
-								ic.destroy()
-						except:
-								traceback.print_exc()
-								status = 1
-        return cmd;
+                    traceback.print_exc()
+                    status = 1
+                    if ic:
+                        try:
+                            ic.destroy()
+                        except:
+                            traceback.print_exc()
+                            status = 1
+               return cmd;
+                        
+    def FrontendLogin(self, uname, current=None):
+	#self._client[uname] = self._hosts[0]
+	#connet to backend, create user space
+        pass
 
-	def FrontendLogin(self, uname, current=None):
-		#self._client[uname] = self._hosts[0]
-		#connet to backend, create user space
-		pass
-
-	def FrontendLogout(self, uname, current=None):
-		pass
+    def FrontendLogout(self, uname, current=None):
+        pass
 
 
 class Server(Ice.Application):
@@ -127,6 +126,7 @@ class Server(Ice.Application):
         if self.interrupted():
              print self.appName() + ": terminating"
         return 0
+
 
 app = Server()
 sys.exit(app.main(sys.argv))
