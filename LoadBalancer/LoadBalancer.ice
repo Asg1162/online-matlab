@@ -17,6 +17,8 @@ module Matcloud {
        };
        interface Frontend {
                  string FrontendAgent(string cmd);
+				 string FrontendLogin(string uname);
+				 string FrontendLogout(string uname);
        };
 
 };
