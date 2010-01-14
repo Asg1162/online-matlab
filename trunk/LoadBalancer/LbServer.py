@@ -47,8 +47,9 @@ class QueryI(Matcloud.Query):
 class FrontendI(Matcloud.Frontend):
     # Constructor and operations here...
     _adapter = None
-    def __init__(self):
-#        self._hosts = hosts
+    def __init__(self, host):
+        self._hosts = hosts
+		self._client = {}
 
         myID = Ice.Identity();
         myID.name = "Frontend"
@@ -62,7 +63,38 @@ class FrontendI(Matcloud.Frontend):
                 
     def FrontendAgent(self, cmd, current=None):
         print "received command %s" % cmd;
+		try:
+				ic = Ice.initialize(sys.argv)
+				bebase = ic.stringToProxy("Parser:tcp -h os40.csc.ncsu.edu -p 10001")
+				parser = Matcloud.ParserPrx.checkedCast(bebase)
+				if not parser:
+						raise RuntimeError("Invalid proxy")
+				parser.("os40.csc.ncsu.edu")
+
+				qebase = ic.stringToProxy("Query:tcp -h os56.csc.ncsu.edu -p 10000")
+				query = Matcloud.QueryPrx.checkedCast(qebase)
+				nbNode = query.queryNbNodes()
+
+				print "there are %d node" % nbNode
+
+		except:
+				traceback.print_exc()
+				status = 1
+				if ic:
+						try:
+								ic.destroy()
+						except:
+								traceback.print_exc()
+								status = 1
         return cmd;
+
+	def FrontendLogin(self, uname, current=None):
+		#self._client[uname] = self._hosts[0]
+		#connet to backend, create user space
+		pass
+
+	def FrontendLogout(self, uname, current=None):
+		pass
 
 
 class Server(Ice.Application):
@@ -83,7 +115,7 @@ class Server(Ice.Application):
         # create the backend
         be = BackendI(self._hosts)
         qu = QueryI(self._hosts)
-        fe = FrontendI()
+        fe = FrontendI(self._host)
         
         # Create the root directory (with name "/" and no parent)
         #
