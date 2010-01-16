@@ -50,6 +50,7 @@ namespace ONLINE_MATLAB {
     else{
       U->setNext(S);
       S->setNext(VT);
+      VT->setNext(NULL);
       return U;
     }
   }
