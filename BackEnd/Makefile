@@ -11,7 +11,7 @@ SRC_OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, ${SRC})
 
 CPPFLAGS = -g -Wno-write-strings
 
-TARGET = $(ROOTDIR)/parser
+TARGET ?= $(ROOTDIR)/parser
 LEX_YY_O = $(ROOTDIR)/lex.yy.o
 LEX_YY_C = $(ROOTDIR)/lex.yy.c
 LEXYA_L = $(ROOTDIR)/lexya.l
@@ -33,9 +33,21 @@ CULA_INC_PATH =$(CULA_INSTALL_PATH)/include
 CULA_LIB_PATH_32 =$(CULA_INSTALL_PATH)/lib32
 CULA_LIB_PATH_64 =$(CULA_INSTALL_PATH)/lib64
 
-INCLUDES=-I${CULA_INC_PATH} -I$(ROOTDIR)/.
+CUDA_INSTALL_PATH ?= /usr/local/cuda
+CUDA_INC_PATH = $(CUDA_INSTALL_PATH)/include
+
+INCLUDES=-I${CULA_INC_PATH} -I$(ROOTDIR)/. -I${CUDA_INC_PATH}
 GPU_LIBS=-L${CULA_LIB_PATH_64} -lcula -lcublas -lcudart
 ICE_LIBS=-L${ICE_HOME_LIB} -lIce -lIceUtil
+
+target: $(TARGET)
+
+unittest: $(ROOTDIR)/unittest/bin/%
+
+
+$(ROOTDIR)/unittest/bin/%: ${LoadBalancer_O} $(ROOTDIR)/unittest/src/%.cpp
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -lpthread -o $@ $(ROOTDIR)/unittest/$@.cpp
+	
 
 $(TARGET):$(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(ROOTDIR)/Makefile ${LoadBalancer_O}
 	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -lpthread -o $(TARGET)
@@ -62,7 +74,7 @@ $(MAIN_O): $(ROOTDIR)/main.cpp  $(ROOTDIR)/LoadBalancer.cpp
 
 ${LoadBalancer_O} $(ROOTDIR)/LoadBalancer.cpp: $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice
 	slice2cpp --output-dir $(ROOTDIR) $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice 
-	$(CC) -I${ICE_HOME_INC} -I$(ROOTDIR)/. -c $(ROOTDIR)/LoadBalancer.cpp
+	$(CC) -I${ICE_HOME_INC} -I$(ROOTDIR)/. -c $(ROOTDIR)/LoadBalancer.cpp -o ${LoadBalancer_O}
 
 #rules:
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp 

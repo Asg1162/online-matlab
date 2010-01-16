@@ -1,4 +1,5 @@
 #include "Atom.h"
+#include <cublas.h>
 
 using namespace std;
 
@@ -10,6 +11,7 @@ namespace ONLINE_MATLAB{
   mBufSize(1)
 {
   mHostBuffer = 0;
+  mDvceBuffer = 0;
 }
 
   Atom :: Atom(int dim, int *dims)
@@ -25,8 +27,9 @@ namespace ONLINE_MATLAB{
   mDim = dim;
   printf("%p here in atom.dim = %d\n", this, mDim);
   mInitialized = false;
-  mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(double));
-  
+  mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(OM_SUPPORT_TYPE));
+  cublasStatus status = cublasAlloc(mBufSize, sizeof(OM_SUPPORT_TYPE), (void **)&mDvceBuffer);
+  assert(status == CUBLAS_STATUS_SUCCESS);
   /*mBufSize = 1;
 
   va_list ap;
@@ -59,7 +62,8 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
   mDim = dim;
   mInitialized = true; 
   mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(OM_SUPPORT_TYPE));
-
+  cublasStatus status = cublasAlloc(mBufSize, sizeof(OM_SUPPORT_TYPE), (void **)&mDvceBuffer);
+  assert(status == CUBLAS_STATUS_SUCCESS);
   // if dim = 2, convert from row-wise to column-wise
   if (dim == 2)
     {
@@ -80,6 +84,9 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
           mHostBuffer[i] = elements[i];
         }
     }
+
+  // sync with device buffer
+  cublasSetVector(mBufSize , sizeof(OM_SUPPORT_TYPE), mHostBuffer, 1, mDvceBuffer, 1);
 }
 
   void Atom :: setDims(int dim, int *dims)
@@ -94,12 +101,14 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
       }
   mInitialized = false; 
   mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(OM_SUPPORT_TYPE));
-
+  cublasStatus status = cublasAlloc(mBufSize, sizeof(OM_SUPPORT_TYPE), (void **)&mDvceBuffer);
+  assert(status == CUBLAS_STATUS_SUCCESS);
   }
 
 void Atom :: setScalaValue(OM_SUPPORT_TYPE v){
   mInitialized = true;
   *mHostBuffer = v;
+  cublasSetVector(1, sizeof(OM_SUPPORT_TYPE), mHostBuffer, 1, mDvceBuffer, 1);
 }
 
 
@@ -111,6 +120,9 @@ OM_SUPPORT_TYPE Atom :: getScalaValue(){
 Atom :: ~Atom(){
   if(mHostBuffer)
     free(mHostBuffer);
+  if(mDvceBuffer)
+    cublasFree(mDvceBuffer);
+    
 }
 
 OM_SUPPORT_TYPE Atom :: getElementAt(int x, int y) const{
@@ -145,6 +157,12 @@ void Atom :: setDim(int _dim, ...){
  
   mBufSize = length;
 
+}
+
+void Atom::syncFromDevice() 
+{  
+  cublasStatus status = cublasGetVector(getBufferSize(), sizeof(OM_SUPPORT_TYPE), mDvceBuffer, 1, mHostBuffer, 1);
+  assert(status == CUBLAS_STATUS_SUCCESS);
 }
 
 void Atom::streamAtom(stringstream &out) 
