@@ -45,6 +45,7 @@ class ParserI:public Parser{
           int m = rest.find(":");
           string username = rest.substr(0,m);
           Command *command = new Command(rest.c_str() + m+1, output, username );
+          gOutput.str(std::string()); // clear the buffer
           command->lock();
           gMatlab->getCritiqueQueue()->push(command);
           cout << "received command " << cmd << endl;
