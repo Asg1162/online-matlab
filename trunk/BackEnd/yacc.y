@@ -8,6 +8,7 @@
 #include "include/Matlab.h"
 #include "include/Matrix.h"
 #include <regex.h>
+#include <sstream>
 
   using namespace ONLINE_MATLAB;
 /* prototypes */
@@ -32,7 +33,7 @@ extern int yy_flex_debug;
 
 extern Matlab *gMatlab;
  extern std::string gCurUser;
-
+ extern std::stringstream gOutput;
 %}
 
 
@@ -72,7 +73,15 @@ function                { ; }
         ;
 
 function:
-function stmt         { execute($2); freeNode($2); }
+function stmt         { Matrix *m = execute($2); printf("free the tree.\n");    freeNode($2);
+  Matrix *next = m;
+  while(next)  {
+    printf("streamout matrix %p.\n", next);
+    next->streamOut(gOutput);
+    next = m->getNext();
+  }
+
+}
   // Matrix *tmp = execute($2); 
   //  updateVar("ans")(tmp);//}
         | /* NULL */
@@ -241,11 +250,11 @@ nodeType *matrix(char *m){
       if((result != 0) || (pmatch[0].rm_so == -1))
             break;
 
-      strt_pointer += pmatch[0].rm_eo;
-      m[strt_pointer] = '\0';
+      strt_pointer = pmatch[0].rm_eo;
+      strToRead[strt_pointer] = '\0';
       *element = atof(strToRead+pmatch[0].rm_so);
       ++element;
-      strToRead = m + strt_pointer;
+      strToRead += strt_pointer + 1;
     }
 
   free(scomma); 
@@ -489,15 +498,19 @@ Matrix *execute(nodeType *p) {
         //    case typeCon: printf("#########  in exec: converting floating point %s.\n", p->con.value);
       case typeCon:      
         {
-          Matrix *m = new Matrix(2, 1, 1);
+          string constant("constant");
+          Matrix *m = new Matrix(constant.c_str(), 2, 1, 1);
            m->setScalaValue(p->con.value);
            p->myMatrix = (void *)m; // save it, or free in future
            return m;
         }
       case typeVec:
         {
-          Matrix *m = new Matrix(p->vec.dim, p->vec.dims, p->vec.elements);
+          string tmp("tmp");
+          printf("create a temp matrix.\n");
+          Matrix *m = new Matrix(tmp.c_str(), p->vec.dim, p->vec.dims, p->vec.elements);
           p->myMatrix = (void *)m;  // save it, for free in future
+          printf(" return a temp matrix\n");
           return m;
         }
       case typeId:
@@ -514,7 +527,14 @@ Matrix *execute(nodeType *p) {
            int noRtns = p->opr.op[0]->id.list_size;           
            if (noRtns == 1)
              {
-               gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, execute(p->opr.op[1]));
+               printf("here.\n");
+               Matrix *rtn =  execute(p->opr.op[1]);
+               gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, rtn);
+               printf("here2.\n");
+               p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+               if (p->opr.op[1]->type == typeVec)
+                 p->opr.op[1]->myMatrix = 0;
+               return rtn;
              }
            else if (noRtns > 1) 
              {
@@ -537,9 +557,10 @@ Matrix *execute(nodeType *p) {
                    gMatlab->getUser(gCurUser)->updateVar(outputs->id.id, rtns[i]);
                    outputs = outputs->id.next;
                  }
+               p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+               return rtns[0];
              }
-           p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
-           return 0;
+
            }
          case '*': 
            return *(execute(p->opr.op[0])) * (*execute(p->opr.op[1]));

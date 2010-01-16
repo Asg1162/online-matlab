@@ -8,8 +8,8 @@ class Matrix : public Atom {
   
   public:
     //    Matrix();
-    Matrix(int dim, ...);
-  Matrix(int dim, int *dims, OM_SUPPORT_TYPE *elements);
+    Matrix(const char *name, int dim, ...);
+    Matrix(const char *name, int dim, int *dims, OM_SUPPORT_TYPE *elements);
   //    Matrix();
     ~Matrix();
 
@@ -22,14 +22,25 @@ class Matrix : public Atom {
     {
       return mNext;
     }
+    const char *getName() const
+    {
+      return mName;
+    }
 
+    void updateName(const char *name)
+    {
+      mName = name;
+    }
     void setNext(Matrix *next)
     {
       mNext = next;
     }
 
+    void streamOut(std::stringstream &out);
+
   private:
     Matrix *mNext;  // currently used when the function has multiple returns
+    const char *mName;
 };
 
 

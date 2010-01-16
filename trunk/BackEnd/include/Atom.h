@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "assert.h"
-
+#include <sstream>
 /* This base class encapsulates gpu memory manipulations
  */
 
@@ -36,6 +36,9 @@ public:
     void setElementAt(int x, int y, OM_SUPPORT_TYPE ele);
 
     OM_SUPPORT_TYPE *getInternalBuffer() { return mHostBuffer; }
+
+ protected:
+    void streamAtom(std::stringstream &out); 
 private:
 
     //    void initGpu();

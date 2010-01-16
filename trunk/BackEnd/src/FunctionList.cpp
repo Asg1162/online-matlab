@@ -9,7 +9,7 @@ namespace ONLINE_MATLAB {
 {
   assert(nooutput == 1);
   printf("init rand dimension (%d %d).\n", (int)matrices[0]->getScalaValue(), (int)matrices[1]->getScalaValue());
-  Matrix *re  = new Matrix(noargs, (int)matrices[0]->getScalaValue(), (int)matrices[1]->getScalaValue());  
+  Matrix *re  = new Matrix(NULL, noargs, (int)matrices[0]->getScalaValue(), (int)matrices[1]->getScalaValue());  
   printf("get dim = %d. \n", re->getDim());
   assert(re->getDim() == 2);
   re->setInitialized(true);
@@ -25,10 +25,10 @@ namespace ONLINE_MATLAB {
     assert(matrices[0]->getDim() == 2);
     int M = matrices[0]->getDimAt(0);
     int N = matrices[0]->getDimAt(1);
-    Matrix *U = new Matrix(2, M, M);
+    Matrix *U = new Matrix((const char *)NULL, 2, M, M);
     int ucol = M<N? M: N;
-    Matrix *S = new Matrix(2, 1, ucol);
-    Matrix *VT = new Matrix(2, N, N);
+    Matrix *S = new Matrix(NULL, 2, 1, ucol);
+    Matrix *VT = new Matrix(NULL, 2, N, N);
     printf("doing svd for matric %d X %d", M, N);
 
     int lda = M;

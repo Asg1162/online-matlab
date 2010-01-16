@@ -71,7 +71,7 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
       int index = 0;
       for (int i = 0; i < mDLen[1]; i++)
         for (int j = 0; j < mDLen[0]; j++)
-          mHostBuffer[index++] = buffer[i][j];
+          mHostBuffer[index++] = buffer[j][i];
     }
   else // else use row-wise
     {
@@ -114,11 +114,11 @@ Atom :: ~Atom(){
 }
 
 OM_SUPPORT_TYPE Atom :: getElementAt(int x, int y) const{
-  return mHostBuffer[x * mDLen[1] + y ];
+  return mHostBuffer[y * mDLen[1] + x ];
 }
 
 void Atom :: setElementAt(int x, int y, OM_SUPPORT_TYPE ele){
-  mHostBuffer[x * mDLen[1] + y] = ele;
+  mHostBuffer[y * mDLen[1] + x] = ele;
 }
 
 
@@ -147,4 +147,30 @@ void Atom :: setDim(int _dim, ...){
 
 }
 
+void Atom::streamAtom(stringstream &out) 
+{
+  if (getDim() == 1)
+    {
+      for (int i = 0; i != mDLen[0]; i++)
+        out << mHostBuffer[i] << " " ;
+
+      out << "<br>" << endl;
+       //       for (int i = 0; 
+    }
+  else if (getDim() == 2)
+    {
+      for (int i = 0; i != mDLen[0]; i++)
+        {
+          for (int j = 0; j != mDLen[1]; j++)
+            out << getElementAt(i,j) << " ";
+          out << "<br>" <<  endl;
+        }
+      out << "<br>" << endl;
+    }
+  else
+    {
+      assert(0); // TODO not supported now
+    }
 }
+
+} // namespace
