@@ -40,7 +40,10 @@ UserSpace :: ~UserSpace(){
      {
        mVars.insert(std::pair<std::string, Matrix *>(v, newVal));
      }
+   varIter it = mVars.find(v);
+   newVal->updateName((*it).first.c_str());
  }
+
 
 Matrix* UserSpace :: getVar(const char *varName){
   std::string v(varName);

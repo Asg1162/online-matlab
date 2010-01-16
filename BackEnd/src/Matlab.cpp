@@ -2,22 +2,56 @@
 #include <cassert>
 #include "FunctionList.h"
 #include "Gpu.h"
+#include "Command.h"
 #include <iostream>
 
 namespace ONLINE_MATLAB{
 
   using namespace std;
 
+
+extern "C" void 
+  launchGpu_thread(void *q) 
+  {
+    int r = initGpu(0); // TODO pass gpuid 
+    //    cublasInit();
+    if (r != 0)
+      {
+        std::cout << "failed to initialize GPU, quitting...\n" << std::endl;
+        exit(0);
+      }
+
+    printf("inside gpu thread.\n");
+    CritiqueQueue<Command *> *gpuQueue = (CritiqueQueue<Command *> *)q;
+    int done = 0;
+    while(1)
+      {
+        while(!gpuQueue->empty())
+          {
+            Command *command = gpuQueue->front();
+            gpuQueue->pop();
+            printf("gpu thread run command .\n");
+            command->run();
+            //            cutilSafeCall( cudaThreadSynchronize() ); // kernel launch is asnchronous, need to sync
+            //            delete command;
+          }
+        if (done) break;
+        gpuQueue->lock();
+        gpuQueue->wait();
+        gpuQueue->unlock();
+      }
+    printf("existing gpu thread.\n");
+  }
+
+
 Matlab :: Matlab(int gpuId){
   // build the function map
   mFunctions["rand"] = omSgerand;
   mFunctions["svd"] = omSgesvd;
-  int r = initGpu(gpuId);
-  if (r != 0)
-    {
-      std::cout << "failed to initialize GPU, quitting...\n" << std::endl;
-      exit(0);
-    }
+  pthread_mutex_init(&mUserspaceLock, NULL);
+
+  //  start a gpu thread
+  pthread_create(&mGpuThreadt, NULL, (void *(*)(void*))launchGpu_thread, &mGpuCommandQueue);
 }
 
 Matlab :: ~Matlab(){
@@ -31,17 +65,25 @@ Matlab :: ~Matlab(){
 
 void Matlab :: newUser(std::string name){
   // TODO more robust
+  pthread_mutex_lock(&mUserspaceLock);
+  
   assert(mUsers.find(name) == mUsers.end());
   mUsers[name] = new UserSpace(this); 
+  pthread_mutex_unlock(&mUserspaceLock);
 }
 
 void Matlab :: delUser(std::string name){
+  pthread_mutex_lock(&mUserspaceLock);
   delete(mUsers[name]);
   mUsers.erase(name);
+  pthread_mutex_unlock(&mUserspaceLock);
 }
 
 UserSpace* Matlab :: getUser(std::string name){
-  return mUsers[name];
+  pthread_mutex_lock(&mUserspaceLock);
+  UserSpace *space = mUsers[name];
+  pthread_mutex_unlock(&mUserspaceLock);
+  return space;
 }
 
  OM_FUNCTION Matlab :: getFunction(const std::string &funcName) 

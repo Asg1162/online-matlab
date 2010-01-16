@@ -1,15 +1,15 @@
 #include "Matrix.h"
 #include "assert.h"
+#include <iostream>
+
 namespace ONLINE_MATLAB{
 
+using namespace std;
 
-  /*Matrix :: Matrix():
-  Atom()
-  {}*/
-
-  Matrix :: Matrix(int _dim, ...):
+  Matrix :: Matrix(const char *name, int _dim, ...):
   Atom(_dim),
-    mNext(0)
+    mNext(0),
+    mName(name)
 {
 
   int dims[_dim];
@@ -26,9 +26,10 @@ namespace ONLINE_MATLAB{
   //  mHostBuffer = (void *)calloc(length, sizeof(OM_SUPPORT_TYPE));
 }
 
-Matrix :: Matrix(int dim, int *dims, OM_SUPPORT_TYPE *elements):
+  Matrix :: Matrix(const char *name, int dim, int *dims, OM_SUPPORT_TYPE *elements):
   Atom(dim, dims, elements),
-    mNext(0)
+    mNext(0),
+    mName(name)
 {
 }
   /*Matrix :: Matrix():
@@ -70,7 +71,7 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
   int dims[2];
   dims[0] = this->getDimAt(0);
   dims[1] = this->getDimAt(1);
-  Matrix *result = new Matrix(2, dims[0], dims[1]);  
+  Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);  
 
   int i = 0;
   for (int x = 0; x != this->getDimAt(0); x++)
@@ -84,12 +85,16 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
         result->setElementAt(x, y, element);
       }
 
-        
-      
   // TODO do the multiplication!!!
   //  result->setScalaValue(3.14);
   printf("do the mulplication.\n");
   return result;
 }
 
-}
+ void Matrix::streamOut(stringstream &out)
+ {
+   out << "<br>" << endl <<  getName() << " =" << "<br>"  << endl;
+   streamAtom(out);
+ }
+
+} // namespace
