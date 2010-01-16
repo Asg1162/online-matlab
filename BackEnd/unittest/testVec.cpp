@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   gMatlab->newUser(gCurUser);
 
   //yy_flex_debug = 1;
-  std::string input = "[u s v] = svd([1 2 ;  3 1]);";
+  std::string input = "a = [1000 100; 20 30; 1 1 ];";
   std::string output;
   
   Command *command = new Command(input.c_str(), output, username);
