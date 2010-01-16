@@ -28,6 +28,7 @@ public:
   int getBufferSize() const { return mBufSize; }
 
   void syncFromDevice() ;
+  void syncToDevice() ;
 
   void setScalaValue(OM_SUPPORT_TYPE v);
   OM_SUPPORT_TYPE getScalaValue();
