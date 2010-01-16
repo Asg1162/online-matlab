@@ -42,12 +42,13 @@ ICE_LIBS=-L${ICE_HOME_LIB} -lIce -lIceUtil
 
 target: $(TARGET)
 
-unittest: $(ROOTDIR)/unittest/bin/%
+unittest: $(patsubst $(ROOTDIR)/unittest/%.cpp, $(TEST_BIN_DIR)/%, $(TEST_CASE_SRC))
 
 
-$(ROOTDIR)/unittest/bin/%: ${LoadBalancer_O} $(ROOTDIR)/unittest/src/%.cpp
-	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -lpthread -o $@ $(ROOTDIR)/unittest/$@.cpp
-	
+$(TEST_BIN_DIR)/%:  $(ROOTDIR)/unittest/%.cpp $(SRC_OBJ) $(LEX_YY_O) $(YACC_TAB_O)
+	mkdir -p $(ROOTDIR)/unittest/bin
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O)  ${LoadBalancer_O} -lpthread -o $@ $< $(SRC_OBJ)
+
 
 $(TARGET):$(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(ROOTDIR)/Makefile ${LoadBalancer_O}
 	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -lpthread -o $(TARGET)

@@ -132,7 +132,7 @@ OM_SUPPORT_TYPE Atom :: getElementAt(int x, int y) const{
 }
 
 void Atom :: setElementAt(int x, int y, OM_SUPPORT_TYPE ele){
-  mHostBuffer[y * mDLen[1] + x] = ele;
+  mHostBuffer[y * mDLen[0] + x] = ele;
 }
 
 

@@ -78,7 +78,7 @@ function stmt         { Matrix *m = execute($2); printf("free the tree.\n");    
   while(next)  {
     printf("streamout matrix %p.\n", next);
     next->streamOut(gOutput);
-    next = m->getNext();
+    next = next->getNext();
   }
 
 }
@@ -558,7 +558,7 @@ Matrix *execute(nodeType *p) {
                    outputs = outputs->id.next;
                  }
                p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
-               return rtns[0];
+               return rtns[noRtns-1];
              }
 
            }
