@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys, threading, Ice, Matcloud
 
 # BackendI servant class ...
@@ -63,7 +65,7 @@ class FrontendI(Matcloud.Frontend):
         thisNode = Matcloud.FrontendPrx.uncheckedCast(self._adapter.createProxy(myID))
                 
     def FrontendAgent(self, cmd, current=None):
-		print "received command %s" % cmd;
+		print "received command %s" % cmd
 		rtn = ""
 		try:
                     ic = Ice.initialize(sys.argv)
@@ -72,7 +74,7 @@ class FrontendI(Matcloud.Frontend):
                     if not parser:
                         raise RuntimeError("Invalid proxy")
                     rtn = parser.command(cmd)
-
+                    print " received return string %s " % rtn
 		except:
                     traceback.print_exc()
                     status = 1
