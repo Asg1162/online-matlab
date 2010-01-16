@@ -73,9 +73,14 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
         bufferd[i] = elements[i];
       // transpose
       int index = 0;
-      for (int i = 0; i < mDLen[1]; i++)
-        for (int j = 0; j < mDLen[0]; j++)
+		printf("************************\n");
+      for (int i = 0; i < mDLen[1]; i++){
+        for (int j = 0; j < mDLen[0]; j++){
           mHostBuffer[index++] = buffer[j][i];
+		  printf("%f ", mHostBuffer[index-1]);
+		}
+	  }
+		printf("************************\n");
     }
   else // else use row-wise
     {
@@ -126,7 +131,7 @@ Atom :: ~Atom(){
 }
 
 OM_SUPPORT_TYPE Atom :: getElementAt(int x, int y) const{
-  return mHostBuffer[y * mDLen[1] + x ];
+  return mHostBuffer[y * mDLen[0] + x ];
 }
 
 void Atom :: setElementAt(int x, int y, OM_SUPPORT_TYPE ele){
