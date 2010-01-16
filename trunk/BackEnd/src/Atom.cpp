@@ -73,14 +73,11 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
         bufferd[i] = elements[i];
       // transpose
       int index = 0;
-		printf("************************\n");
       for (int i = 0; i < mDLen[1]; i++){
         for (int j = 0; j < mDLen[0]; j++){
           mHostBuffer[index++] = buffer[j][i];
-		  printf("%f ", mHostBuffer[index-1]);
 		}
 	  }
-		printf("************************\n");
     }
   else // else use row-wise
     {
