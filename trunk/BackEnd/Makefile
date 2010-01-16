@@ -60,7 +60,7 @@ $(LEX_YY_C):$(LEXYA_L)
 $(MAIN_O): $(ROOTDIR)/main.cpp  $(ROOTDIR)/LoadBalancer.cpp
 	$(CC) -m64 -I$(ROOTDIR)/include -I$(ROOTDIR)/. -c $< -o $(MAIN_O)
 
-${LoadBalancer_O}: $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice
+${LoadBalancer_O} $(ROOTDIR)/LoadBalancer.cpp: $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice
 	slice2cpp --output-dir $(ROOTDIR) $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice 
 	$(CC) -I${ICE_HOME_INC} -I$(ROOTDIR)/. -c $(ROOTDIR)/LoadBalancer.cpp
 
