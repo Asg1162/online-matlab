@@ -187,6 +187,7 @@ int main(int argc, char **argv)
 
     }
 #endif 
+  delete gMatlab;
 
   return 0;
 

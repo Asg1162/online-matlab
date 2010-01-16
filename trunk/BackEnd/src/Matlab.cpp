@@ -3,6 +3,7 @@
 #include "FunctionList.h"
 #include "Gpu.h"
 #include "Command.h"
+#include "cublas.h"
 #include <iostream>
 
 namespace ONLINE_MATLAB{
@@ -20,6 +21,14 @@ extern "C" void
         std::cout << "failed to initialize GPU, quitting...\n" << std::endl;
         exit(0);
       }
+    cublasStatus cublasStatus;
+    cublasStatus = cublasInit();
+    if (cublasStatus != CUBLAS_STATUS_SUCCESS) {
+      cout << "!!!! CUBLAS initialization error" << endl;
+      return;
+    }
+
+
 
     printf("inside gpu thread.\n");
     CritiqueQueue<Command *> *gpuQueue = (CritiqueQueue<Command *> *)q;
@@ -40,6 +49,7 @@ extern "C" void
         gpuQueue->wait();
         gpuQueue->unlock();
       }
+    cublasShutdown();
     printf("existing gpu thread.\n");
   }
 

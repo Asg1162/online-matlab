@@ -25,6 +25,10 @@ public:
       return mDLen.size();
   }
 
+  int getBufferSize() const { return mBufSize; }
+
+  void syncFromDevice() ;
+
   void setScalaValue(OM_SUPPORT_TYPE v);
   OM_SUPPORT_TYPE getScalaValue();
     bool initialized() const 
@@ -37,13 +41,15 @@ public:
 
     OM_SUPPORT_TYPE *getInternalBuffer() { return mHostBuffer; }
 
+    const OM_SUPPORT_TYPE *getDevicePtr()  const { return mDvceBuffer; }
+
  protected:
     void streamAtom(std::stringstream &out); 
 private:
 
     //    void initGpu();
   OM_SUPPORT_TYPE *mHostBuffer;
-  void *mDvceBuffer;
+  OM_SUPPORT_TYPE *mDvceBuffer;
   bool mInitialized;
   int mDim;
   std::vector<int> mDLen;

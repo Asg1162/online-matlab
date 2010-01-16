@@ -1,6 +1,7 @@
 #include "Matrix.h"
 #include "assert.h"
 #include <iostream>
+#include <cublas.h>
 
 namespace ONLINE_MATLAB{
 
@@ -73,6 +74,7 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
   dims[1] = this->getDimAt(1);
   Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);  
 
+#if 0
   int i = 0;
   for (int x = 0; x != this->getDimAt(0); x++)
     for (int y = 0; y != rhs.getDimAt(1); y++)
@@ -84,6 +86,14 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
           }
         result->setElementAt(x, y, element);
       }
+#else
+  cublasSgemm('n', 'n', getDimAt(0), getDimAt(1), rhs.getDimAt(1), 1.0, getDevicePtr(), getDimAt(0), rhs.getDevicePtr(), rhs.getDimAt(0), 0.0, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), result->getDimAt(0));
+
+  assert(cublasGetError() == CUBLAS_STATUS_SUCCESS);
+
+  result->syncFromDevice(); 
+
+#endif
 
   // TODO do the multiplication!!!
   //  result->setScalaValue(3.14);
