@@ -118,7 +118,7 @@ expr:
 | MATRIX_LIST   { $$ = matrix_list($1); free($1); }
 | VARIABLE              { printf(" convert variable %s.\n", $1) ;$$ = id($1); free($1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
-        | expr '+' expr         { printf(" adding %s and %s.\n", $1->id.id, $3->con.value);  $$ = opr('+', 2, $1, $3); }
+        | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
         | expr '*' expr         { $$ = opr('*', 2, $1, $3); }
         | expr '/' expr         { $$ = opr('/', 2, $1, $3); }
@@ -564,6 +564,10 @@ Matrix *execute(nodeType *p) {
            }
          case '*': 
            return *(execute(p->opr.op[0])) * (*execute(p->opr.op[1]));
+         case '+': 
+           return *(execute(p->opr.op[0])) + (*execute(p->opr.op[1]));
+         case '-': 
+           return *(execute(p->opr.op[0])) - (*execute(p->opr.op[1]));
          default:
            // TODO add more operators
            printf("unknown operator %c.\n", p->opr.oper);

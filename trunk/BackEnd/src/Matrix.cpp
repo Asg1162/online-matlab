@@ -54,6 +54,55 @@ void Matrix :: allocMatrix(){
   mHostBuffer = (void *)realloc(mHostBuffer, length);*/
 }
 
+//TODO: throw exception when dims do not match
+Matrix *Matrix :: operator+(Matrix const &rhs) const
+{
+	printf("in operator +\n");
+	assert(this->getDimAt(0)==rhs.getDimAt(0));
+	assert(this->getDimAt(1)==rhs.getDimAt(1));
+
+	int dims[2];
+	dims[0] = this->getDimAt(0);
+	dims[1] = this->getDimAt(1);
+printf("addition1\n");
+	Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);
+	for(int i=0; i<dims[0]; i++){
+		for(int j=0; j<dims[1]; j++){
+			result->setElementAt(i, j, this->getElementAt(i, j) + rhs.getElementAt(i, j));
+		}
+	}
+
+	result->syncToDevice();
+
+	return result;
+
+}
+
+//TODO: throw exception when dims do not match
+Matrix *Matrix :: operator-(Matrix const &rhs) const
+{
+	printf("in operator +\n");
+	assert(this->getDimAt(0)==rhs.getDimAt(0));
+	assert(this->getDimAt(1)==rhs.getDimAt(1));
+
+	int dims[2];
+	dims[0] = this->getDimAt(0);
+	dims[1] = this->getDimAt(1);
+printf("addition1\n");
+	Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);
+	for(int i=0; i<dims[0]; i++){
+		for(int j=0; j<dims[1]; j++){
+			result->setElementAt(i, j, this->getElementAt(i, j) - rhs.getElementAt(i, j));
+		}
+	}
+
+	result->syncToDevice();
+
+	return result;
+
+}
+
+
 Matrix *Matrix :: operator*(Matrix const &rhs) const
 {
 
@@ -71,7 +120,7 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
   assert(this->getDimAt(1) == rhs.getDimAt(0));
   int dims[2];
   dims[0] = this->getDimAt(0);
-  dims[1] = this->getDimAt(1);
+  dims[1] = rhs.getDimAt(1);
   Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);  
 
 #if 0
@@ -87,7 +136,8 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
         result->setElementAt(x, y, element);
       }
 #else
-  cublasSgemm('n', 'n', getDimAt(0), getDimAt(1), rhs.getDimAt(1), 1.0, getDevicePtr(), getDimAt(0), rhs.getDevicePtr(), rhs.getDimAt(0), 0.0, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), result->getDimAt(0));
+
+  cublasSgemm('n', 'n', getDimAt(0), rhs.getDimAt(1), getDimAt(1), 1.0, getDevicePtr(), getDimAt(0), rhs.getDevicePtr(), rhs.getDimAt(0), 0.0, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), result->getDimAt(0));
 
   assert(cublasGetError() == CUBLAS_STATUS_SUCCESS);
 
