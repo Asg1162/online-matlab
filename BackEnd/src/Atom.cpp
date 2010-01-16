@@ -165,6 +165,12 @@ void Atom::syncFromDevice()
   assert(status == CUBLAS_STATUS_SUCCESS);
 }
 
+
+void Atom::syncToDevice(){
+	cublasStatus status = cublasSetVector(getBufferSize(), sizeof(OM_SUPPORT_TYPE), mHostBuffer, 1, mDvceBuffer, 1);
+	assert(status == CUBLAS_STATUS_SUCCESS);
+}
+
 void Atom::streamAtom(stringstream &out) 
 {
   if (getDim() == 1)
