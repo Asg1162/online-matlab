@@ -16,6 +16,8 @@ class Matrix : public Atom {
 
     void allocMatrix();
 
+    Matrix *operator+(Matrix const &rhs) const;
+    Matrix *operator-(Matrix const &rhs) const;
     Matrix *operator*(Matrix const &rhs) const;
 
     Matrix *getNext() const
