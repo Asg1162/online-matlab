@@ -481,6 +481,8 @@ void freeNode(nodeType *p) {
 
 void yyerror(char *s) {
     fprintf(stdout, "%s\n", s);
+    string reason(s);
+    
 }
 
 //int main(void) {
@@ -532,8 +534,8 @@ Matrix *execute(nodeType *p) {
                gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, rtn);
                printf("here2.\n");
                p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
-               if (p->opr.op[1]->type == typeVec)
-                 p->opr.op[1]->myMatrix = 0;
+               //   if (p->opr.op[1]->type == typeVec || p->opr.op[1]->type == typeCon)
+               p->opr.op[1]->myMatrix = 0;
                return rtn;
              }
            else if (noRtns > 1) 
@@ -563,11 +565,20 @@ Matrix *execute(nodeType *p) {
 
            }
          case '*': 
-           return *(execute(p->opr.op[0])) * (*execute(p->opr.op[1]));
+           {
+             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) * (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->opr.op[0]->myMatrix;
+           }
          case '+': 
-           return *(execute(p->opr.op[0])) + (*execute(p->opr.op[1]));
+           {
+             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) + (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->opr.op[0]->myMatrix;
+           }
          case '-': 
-           return *(execute(p->opr.op[0])) - (*execute(p->opr.op[1]));
+           {
+             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) - (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->opr.op[0]->myMatrix;
+           }
          default:
            // TODO add more operators
            printf("unknown operator %c.\n", p->opr.oper);

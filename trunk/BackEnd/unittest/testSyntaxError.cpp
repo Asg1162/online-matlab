@@ -39,8 +39,8 @@ void runtest(const char * input, std::string &output,std::string &username)
   command->wait();
   cout << "wait done " << input << endl;      
   delete command;
-  std::string output1 = gOutput.str();
-  cout << "return output " << output1 << endl;
+  //  std::string output1 = gOutput.str();
+  cout << "return output " << output << endl;
 
 }
 
@@ -56,10 +56,7 @@ int main(int argc, char **argv)
   std::string input = "[u s v] = svd([1 2 ;  3 1]);";
   std::string output;
  
-  runtest("a = [1 2; 3 4; 5 6];" , output, username);
-  //  runtest("b = [1 2; 3 4; 5 6];" , output, username);
-  //  runtest("c = a-b;" , output, username);
-  runtest("d = a+a;" , output, username);
+  runtest("a = [1 2;" , output, username); // wrong syntax
  
   //  yyin = stdin; //std::cin; //fopen("input", "r");
   /*      yy_buffer_state *my_string_buffer  = yy_scan_string(input.c_str());
