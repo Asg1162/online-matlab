@@ -22,8 +22,9 @@ namespace ONLINE_MATLAB{
       yy_buffer_state *my_string_buffer  = yy_scan_string(mInput);
       try {
         yyparse();
-        std::cout << "******* run input " << mInput << std::endl;
+        std::cout << "************* run input " << mInput << std::endl;
         mOutput = gOutput.str();
+        cout << "*************** return output " << mOutput << endl << endl;
       } catch (ParseException &e)
          {
            mOutput = e.getReason();
@@ -32,7 +33,6 @@ namespace ONLINE_MATLAB{
          }
       yy_delete_buffer (my_string_buffer);
       signal();
-      std::cout << "command signal. " << this << std::endl;
       unlock();
     }
 

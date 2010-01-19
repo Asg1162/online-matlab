@@ -24,7 +24,6 @@ namespace ONLINE_MATLAB{
   }
 
   mDim = dim;
-  printf("%p here in atom.dim = %d\n", this, mDim);
   mInitialized = false;
   mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(OM_SUPPORT_TYPE));
   cublasStatus status = cublasAlloc(mBufSize, sizeof(OM_SUPPORT_TYPE), (void **)&mDvceBuffer);

@@ -15,7 +15,6 @@ int initGpu(int gpuId)
   printf("TODO bypassing select %dth device from total of %d.\n", gpuId, numDevices);
   //  status = culaSelectDevice(gpuId); // TODO 
   if (status != culaNoError)  goto _exit;
-  printf("here.\n");
 
   status = culaInitialize();
   if(status != culaNoError) goto _exit;

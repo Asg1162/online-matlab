@@ -50,7 +50,6 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
 
 
 {space}    {  
-  printf("ignore space.\n");  
   ;       /* ignore whitespace */
 }
 
