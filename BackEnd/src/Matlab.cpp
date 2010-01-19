@@ -39,7 +39,6 @@ extern "C" void
           {
             Command *command = gpuQueue->front();
             gpuQueue->pop();
-            printf("gpu thread run command .\n");
             command->run();
             //            cutilSafeCall( cudaThreadSynchronize() ); // kernel launch is asnchronous, need to sync
             //            delete command;

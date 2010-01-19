@@ -23,7 +23,6 @@ UserSpace :: ~UserSpace(){
    //    {
    //      Atom *a = new Matrix();
    std::string v(varName);
-   printf("creating a new var %s.\n", varName);
    mVars.insert(std::pair<std::string, Matrix *>(v, 0));
 }
 
@@ -33,7 +32,6 @@ UserSpace :: ~UserSpace(){
      {
        if (mVars[v] != 0)
          delete mVars[v];
-       printf("here.\n");
        mVars[v] = newVal;
      }
    else
@@ -63,7 +61,6 @@ int UserSpace :: getSize(){
  Matrix *UserSpace :: runFunction(char *funcName, int nooutputs, int noargs, Matrix **matrix)
    {
      Matrix *result;
-     printf("running function %s .**************\n", funcName);
      std::string fun(funcName);
      OM_FUNCTION func = mParent->getFunction(fun);
      result = func(nooutputs, noargs, matrix);

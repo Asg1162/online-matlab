@@ -85,13 +85,17 @@ function stmt         {
        throw; 
      }
 
-  printf("free the tree.\n"); 
+  if (m->getName() == 0) // if the output is not assigned to anyone
+    {
+      gMatlab->getUser(gCurUser)->updateVar("ans", m);  // set to ans
+      $2->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+    }
+
   freeNode($2);
 
   // generate the output
   Matrix *next = m;
   while(next)  {
-    printf("streamout matrix %p.\n", next);
     next->streamOut(gOutput);
     next = next->getNext();
   }
@@ -106,18 +110,20 @@ function stmt         {
 //num_seq, NUMBER  {}
 
 stmt:
-          ';'                            { $$ = opr(';', 2, NULL, NULL); }
-        | expr ';'                       { $$ = $1; }
+          ';'                            { 
+            $$ = opr(';', 2, NULL, NULL); 
+          }
+        | expr ';'                       { 
+          $$ = $1; 
+          }
 // TODO combine the following two cases
-| VARIABLE '=' expr ';'          { printf("***** found assignment for %s *****\n", $1); $$ = opr('=', 2, id($1), $3);  }
-| MATRIX_LIST '=' expr ';'        { printf("*** found assignment for %s. ****\n", $1);  $$ = opr('=', 2, matrix_list($1), $3);}
+        | VARIABLE '=' expr ';'          {  
+          $$ = opr('=', 2, id($1), $3); 
+          }
+        | MATRIX_LIST '=' expr ';'        { 
+          $$ = opr('=', 2, matrix_list($1), $3);
+          }
 
-/*        | PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); } */
-
-/*        | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); } */
-/*        | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); } */
-/*        | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); } */
-/*        | '{' stmt_list '}'              { $$ = $2; } */
         ;
 
 /*stmt_list:
@@ -128,30 +134,44 @@ stmt:
 
 
 expr:
-          NUMBER               { printf("convert number %f.\n", $1) ;$$ = con($1); }
-        | MATRIX		{ $$ = matrix($1);   free($1);  }
-| MATRIX_LIST   { $$ = matrix_list($1); free($1); }
-| VARIABLE              { printf(" convert variable %s.\n", $1) ;$$ = id($1); free($1); }
-        | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
-        | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
-        | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
-        | expr '*' expr         { $$ = opr('*', 2, $1, $3); }
-        | expr '/' expr         { $$ = opr('/', 2, $1, $3); }
-	|VARIABLE '(' ')'       {
-				  assert(0);
-				  $$ = func($1, 0);
-				 }
-	| VARIABLE '(' arg_list ')'  { printf("found function %s", $1); 
-        		 		   /*nodeType *n = g_arguments;
-				            for (int i =0 ; i != g_arguments->arg.noargs; i++)
-   				           {
-			                printf("the %d the argument: %f.\n", i, n->arg.arg->con.value);
-         			       n = n->arg.next;
-				                }*/
- 				           $$ = func($1, $3);
-  				          g_arguments = 0;
-			            //            | [ num_seq; num_seq ]
-                                     } // function
+          NUMBER               { 
+            $$ = con($1); 
+          }
+        | MATRIX		{ 
+          $$ = matrix($1);   
+          free($1);  
+          }
+        | MATRIX_LIST   { 
+          $$ = matrix_list($1); 
+          free($1); 
+          }
+        | VARIABLE     { 
+          $$ = id($1); 
+          free($1); 
+          }
+        | '-' expr %prec UMINUS {
+          $$ = opr(UMINUS, 1, $2);
+          }
+        | expr '+' expr { 
+          $$ = opr('+', 2, $1, $3); 
+          }
+        | expr '-' expr  { 
+          $$ = opr('-', 2, $1, $3);
+          }
+        | expr '*' expr  { 
+          $$ = opr('*', 2, $1, $3); 
+          }
+        | expr '/' expr  { 
+          $$ = opr('/', 2, $1, $3); 
+          }
+        |VARIABLE '(' ')'  {
+          assert(0);  // TODO
+          $$ = func($1, 0);
+         }
+        | VARIABLE '(' arg_list ')'  { 
+          $$ = func($1, $3);
+          g_arguments = 0;
+          } // function
 
 /*      | expr '<' expr         { $$ = opr('<', 2, $1, $3); }
         | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
@@ -163,16 +183,13 @@ expr:
         ;*/
 
 arg_list:
-	expr                  {
-       				 printf("first expr %f \n", $1->con.value);
-			        //        g_arg_list_size = 1; 
-                     $$ =  arg($1);
-			      }
-        | arg_list ',' expr     { printf("found ',' \n"); 
-                $$ = arg($3);
-				        // TODO		  $$ = opr(',', 2, $1, $3); g_arg_list_size++;
-        			}
-        ;
+	expr     {
+      $$ =  arg($1);
+    }
+    | arg_list ',' expr     { 
+      $$ = arg($3);
+      }
+    ;
 
 
 %%
@@ -239,7 +256,6 @@ nodeType *matrix(char *m){
     }
 
   
-  printf("%s there are %d rows.%d total num\n", m, numRows, totalNum);
   int numCol = totalNum/numRows;
 
   nodeType *p  = allocateNode(sizeof(nodeType), typeVec);
@@ -302,12 +318,10 @@ nodeType *matrix_list(char *m){
   int result = regexec(left_mark, strToRead, 1, pmatch, 0);
   assert(result == 0);
   strToRead[pmatch[0].rm_eo-1] = ' ';
-  printf("after matching left mark string = %s.\n", strToRead);
 
   result = regexec(right_mark, strToRead, 1, pmatch, 0);
   assert(result == 0);
   strToRead[pmatch[0].rm_eo-1] = ' ';
-  printf("after matching right mark string = %s.\n", strToRead);
 
   while(1)
     {
@@ -316,7 +330,6 @@ nodeType *matrix_list(char *m){
         break;
 
       strToRead[strt_pointer + pmatch[0].rm_eo-1] = ' ';
-      printf("after matching semi comma string = %s.\n", strToRead);
       strt_pointer += pmatch[0].rm_eo;
       strToRead = m + strt_pointer;
     }
@@ -328,14 +341,12 @@ nodeType *matrix_list(char *m){
   nodeType *cached_p(0);
   while(1)
     {
-      printf("checking variable from %s.\n", strToRead);
       int result = regexec(variable, strToRead, 1, pmatch, 0);
       if((result != 0) || (pmatch[0].rm_so == -1))
             break;
 
       numMatrix++;
       strt_pointer = pmatch[0].rm_eo;
-      printf("converting %c to %c.\n", strToRead[strt_pointer], '\0');
       strToRead[strt_pointer] = '\0';
 
       if (p != 0) 
@@ -345,7 +356,6 @@ nodeType *matrix_list(char *m){
       p->id.next = cached_p;  // reverse order       
       strToRead += strt_pointer+1;
     }
-  printf("setting list_size to %d.\n", numMatrix);
   p->id.list_size = numMatrix;
   
   free(left_mark);
@@ -364,7 +374,6 @@ nodeType *id(char *i) {
 
     /* copy information */
     p->id.id = strdup(i);
-    printf("MEMORYDBG: allocate %p for %s.\n", p->id.id, p->id.id);
     p->id.list_size = 1;
     p->id.next = 0;
 
@@ -439,7 +448,6 @@ nodeType *arg(nodeType *node){
 }
 
 void freeNode(nodeType *p) {
-  printf("free node here.\n");
     int i;
 
     if (!p) return;
@@ -448,7 +456,6 @@ void freeNode(nodeType *p) {
     case typeCon: 
       if (p->myMatrix)
         {
-          printf(" *************** deleting a constant matrix ********** \n");
           if (p->myMatrix)
             delete (Matrix *)(p->myMatrix);
         }
@@ -461,10 +468,14 @@ void freeNode(nodeType *p) {
         delete (Matrix *)(p->myMatrix);
       break;
     case typeId:
-      printf("MEMORYDBG: free %p for %s.\n", p->id.id, p->id.id);
       free(p->id.id);
       break;
     case typeOpr:
+      if (p->opr.oper == '*') 
+        ;
+      if (p->myMatrix)
+        delete (Matrix *)(p->myMatrix);
+
       for (i = 0; i < p->opr.nops; i++)
         freeNode(p->opr.op[i]);
       break;
@@ -474,7 +485,6 @@ void freeNode(nodeType *p) {
         for (i = 0; i < p->fun.noargs; i++)
           {
             nodeType *cur1 = cur;
-            printf("MEMORYDBG: free arglist\n");
             cur = cur1->arg.next;
             freeNode(cur1);
           }
@@ -483,7 +493,6 @@ void freeNode(nodeType *p) {
       }
       break;
     case typeArg:
-      printf("MEMORYDBG: free arg.\n");
       freeNode(p->arg.arg);
       break;
     default:
@@ -511,7 +520,6 @@ Matrix *execute(nodeType *p) {
     if (!p) return 0;
     switch(p->type)
       {
-        //    case typeCon: printf("#########  in exec: converting floating point %s.\n", p->con.value);
       case typeCon:      
         {
           string constant("constant");
@@ -523,10 +531,8 @@ Matrix *execute(nodeType *p) {
       case typeVec:
         {
           string tmp("tmp");
-          printf("create a temp matrix.\n");
           Matrix *m = new Matrix(tmp.c_str(), p->vec.dim, p->vec.dims, p->vec.elements);
           p->myMatrix = (void *)m;  // save it, for free in future
-          printf(" return a temp matrix\n");
           return m;
         }
       case typeId:
@@ -536,17 +542,14 @@ Matrix *execute(nodeType *p) {
       case typeOpr:;
          switch(p->opr.oper) {
          case '=': 
-           printf("inside the = execution, number of return is %d.\n", p->opr.op[0]->id.list_size);
            {
            /* MYTODO */
            assert(p->opr.op[0]->type == typeId);
            int noRtns = p->opr.op[0]->id.list_size;           
            if (noRtns == 1)
              {
-               printf("here.\n");
                Matrix *rtn =  execute(p->opr.op[1]);
                gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, rtn);
-               printf("here2.\n");
                p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
                //   if (p->opr.op[1]->type == typeVec || p->opr.op[1]->type == typeCon)
                p->opr.op[1]->myMatrix = 0;
@@ -569,7 +572,6 @@ Matrix *execute(nodeType *p) {
                nodeType *outputs = p->opr.op[0];
                for (int i = 0; i != noRtns; i++)
                  {
-                   printf("updating variable %s.\n",outputs->id.id);
                    gMatlab->getUser(gCurUser)->updateVar(outputs->id.id, rtns[i]);
                    outputs = outputs->id.next;
                  }
