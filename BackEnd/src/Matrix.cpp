@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cublas.h>
 
+#include "../include/ExeException.h"
+
 namespace ONLINE_MATLAB{
 
 using namespace std;
@@ -111,13 +113,16 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
   int ldim = this->getDim();
   int rdim = rhs.getDim();
   
+  
   assert(ldim == 2);
   assert(rdim == 2);
 
   assert(this->initialized());
   assert(rhs.initialized());
 
-  assert(this->getDimAt(1) == rhs.getDimAt(0));
+  if (this->getDimAt(1) != rhs.getDimAt(0))
+    throw ExeException("Dimension mismatch in matrix multiply");
+
   int dims[2];
   dims[0] = this->getDimAt(0);
   dims[1] = rhs.getDimAt(1);

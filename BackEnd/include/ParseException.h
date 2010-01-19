@@ -13,6 +13,11 @@ class ParseException{
     {
       return mReason;
     }
+  virtual void cleanUp()
+  {
+    // donothing by default
+  }
+
  private:
   std::string mReason;
 };

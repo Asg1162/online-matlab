@@ -16,7 +16,6 @@ namespace ONLINE_MATLAB{
 
   Atom :: Atom(int dim, int *dims)
 {
-
   mBufSize = 1;
 
   for(int i=0; i<dim; i++){
@@ -64,6 +63,12 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
   mHostBuffer = (OM_SUPPORT_TYPE *)calloc(mBufSize, sizeof(OM_SUPPORT_TYPE));
   cublasStatus status = cublasAlloc(mBufSize, sizeof(OM_SUPPORT_TYPE), (void **)&mDvceBuffer);
   assert(status == CUBLAS_STATUS_SUCCESS);
+  if (elements == 0)
+    {
+      mInitialized = false;
+      return;
+    }
+
   // if dim = 2, convert from row-wise to column-wise
   if (dim == 2)
     {
