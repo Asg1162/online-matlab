@@ -8,11 +8,22 @@ namespace ONLINE_MATLAB {
   Matrix *omSgerand(int nooutput, int noargs, Matrix **matrices)
 {
   assert(nooutput == 1);
-  printf("init rand dimension (%d %d).\n", (int)matrices[0]->getScalaValue(), (int)matrices[1]->getScalaValue());
-  Matrix *re  = new Matrix(NULL, noargs, (int)matrices[0]->getScalaValue(), (int)matrices[1]->getScalaValue());  
-  printf("get dim = %d. \n", re->getDim());
-  assert(re->getDim() == 2);
-  re->setInitialized(true);
+  int dims[noargs];
+  int buffersize=1;
+  for (int i = 0; i != noargs; i++)
+    {
+      dims[i] = (int)matrices[i]->getScalaValue();
+      buffersize *= dims[i];
+    }
+
+  OM_SUPPORT_TYPE elements[buffersize];
+  for (int i = 0; i != buffersize; i++)
+    {
+      elements[i] = rand()/(OM_SUPPORT_TYPE)RAND_MAX;
+    }
+
+  Matrix *re  = new Matrix(NULL, noargs, dims, elements);
+    
   re->setNext(0);
   return re;
 }

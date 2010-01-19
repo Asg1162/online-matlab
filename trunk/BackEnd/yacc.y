@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "include/Matlab.h"
 #include "include/Matrix.h"
+#include "include/ParseException.h"
 #include <regex.h>
 #include <sstream>
 
@@ -73,7 +74,21 @@ function                { ; }
         ;
 
 function:
-function stmt         { Matrix *m = execute($2); printf("free the tree.\n");    freeNode($2);
+function stmt         {
+  Matrix *m;
+  try {
+    m = execute($2); 
+  }catch(ParseException &e)
+     {
+       // free node
+       freeNode($2);
+       throw; 
+     }
+
+  printf("free the tree.\n"); 
+  freeNode($2);
+
+  // generate the output
   Matrix *next = m;
   while(next)  {
     printf("streamout matrix %p.\n", next);
@@ -494,7 +509,6 @@ void yyerror(char *s) {
 
 Matrix *execute(nodeType *p) {
     if (!p) return 0;
-    printf("in execution type = %d...\n", p->type);
     switch(p->type)
       {
         //    case typeCon: printf("#########  in exec: converting floating point %s.\n", p->con.value);
