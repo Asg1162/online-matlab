@@ -53,10 +53,9 @@ int main(int argc, char **argv)
   gMatlab->newUser(gCurUser);
 
   //yy_flex_debug = 1;
-  std::string input = "[u s v] = svd([1 2 ;  3 1]);";
   std::string output;
  
-  runtest("a = 1;" , output, username); // wrong syntax
+  runtest("a = rand(2, 3;" , output, username); // wrong syntax
  
   //  yyin = stdin; //std::cin; //fopen("input", "r");
   /*      yy_buffer_state *my_string_buffer  = yy_scan_string(input.c_str());

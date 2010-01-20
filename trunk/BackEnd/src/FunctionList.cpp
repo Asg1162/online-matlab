@@ -84,7 +84,7 @@ namespace ONLINE_MATLAB {
 
     stringstream ss;
 
-    ss << filePath << gCurUser << "_" << seconds << ".png" ;
+    ss << gCurUser << "_" << seconds << ".png" ;
     cout << "user file name is "<< ss.str() << endl;
 
     int picWidth = 200;
