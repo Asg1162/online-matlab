@@ -15,8 +15,9 @@ module Matcloud {
        /* load balancer(server), web server(client) */
        interface Frontend {
                  string FrontendAgent(string cmd);
-				 string FrontendLogin(string uname);
-				 string FrontendLogout(string uname);
+				 string FrontendLogin(string cmd);
+				 string FrontendLogout(string cmd);
+				 string FrontendCalc(string cmd);
        };
 
 
