@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, threading, Ice, Matcloud
+import sys, threading, Ice, Matcloud, traceback
 
 # BackendI servant class ...
 class BackendI(Matcloud.Backend):
@@ -78,13 +78,13 @@ class FrontendI(Matcloud.Frontend):
 		except:
                     traceback.print_exc()
                     status = 1
-                    if ic:
-                        try:
-                            ic.destroy()
-                        except:
-                            traceback.print_exc()
-                            status = 1
-		return rtn
+                   # if ic:
+                   #     try:
+                   #         ic.destroy()
+                   #     except:
+                   #         traceback.print_exc()
+                   #         status = 1
+		return "Internal Error"
                         
     def FrontendLogin(self, uname, current=None):
 	#self._client[uname] = self._hosts[0]
