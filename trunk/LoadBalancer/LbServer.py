@@ -162,6 +162,7 @@ class FrontendI(Matcloud.Frontend):
 				self._mutex.release()
 			except KeyError:
 				print "KeyError found when LOGOUT"
+				return ""
 
 			ic = Ice.initialize(sys.argv)
 			bebase = ic.stringToProxy("Parser:tcp -h "+server[0: server.find(":")]+".csc.ncsu.edu -p 10001")
