@@ -13,6 +13,7 @@ extern int yy_flex_debug;
 
 // hostname
 #include <unistd.h>
+#include "utility.h"
 
 using namespace std;
 using namespace Matcloud;
@@ -25,38 +26,24 @@ struct yy_buffer_state;
 yy_buffer_state *yy_scan_string( const char *yy_str );
 
 using namespace ONLINE_MATLAB;
-Matlab *gMatlab;
-std::string gCurUser;
 
 void yy_delete_buffer (yy_buffer_state *b );
 
-void runtest(const char * input, std::string &output,std::string &username)
-{
-  Command *command = new Command(input, output, username);
-  command->lock();
-  gMatlab->getCritiqueQueue()->push(command);
-  cout << "received command " << input << endl;
-  command->wait();
-  cout << "wait done " << input << endl;      
-  delete command;
-  std::string output1 = gOutput.str();
-  cout << "return output " << output1 << endl;
-
-}
 
 int main(int argc, char **argv)
 {
   gMatlab  = new Matlab(0);
 
-  string username = "xwu";
+  string username = "xwu3";
   gCurUser = username;
   gMatlab->newUser(gCurUser);
 
   //yy_flex_debug = 1;
   std::string input = "rand(2, 3)";
   std::string output;
- 
-  runtest("rand(2, 3);" , output, username);
+
+  runtest("a =[1 2 3 4 5 6 7 8 9 10];", output, username);
+  runtest("plot(a);" , output, username);
 
  
   //  yyin = stdin; //std::cin; //fopen("input", "r");

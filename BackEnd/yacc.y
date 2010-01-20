@@ -84,21 +84,31 @@ function stmt         {
        freeNode($2);
        throw; 
      }
-
-  if (m->getName() == 0) // if the output is not assigned to anyone
+  if ($2->type == typeFun && strcmp($2->fun.func, "plot") == 0)
     {
-      gMatlab->getUser(gCurUser)->updateVar("ans", m);  // set to ans
-      $2->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+      char *filepath = (char *)m; //static_cast<char *>(m);
+      gOutput << filepath;
+      delete filepath;
     }
+  else 
+    {
+      if (m->getName() == 0) // if the output is not assigned to anyone
+        {
+          gMatlab->getUser(gCurUser)->updateVar("ans", m);  // set to ans
+          //      if ($2->type == typeOpr)
+          //        $2->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+          //      else if ($2->type == typeFun)
+          $2->myMatrix = 0;
+        }
+      freeNode($2);
 
-  freeNode($2);
-
-  // generate the output
-  Matrix *next = m;
-  while(next)  {
-    next->streamOut(gOutput);
-    next = next->getNext();
-  }
+      // generate the output
+      Matrix *next = m;
+      while(next)  {
+        next->streamOut(gOutput);
+        next = next->getNext();
+      }
+    }
 
 }
   // Matrix *tmp = execute($2); 

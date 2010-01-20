@@ -60,6 +60,7 @@ class ParserI:public Parser{
           string username(cmd.c_str() + n + 1);
           // add user space
           cout << " add user " << username << endl;
+          // TODO 
           gMatlab->newUser(username);
         }
       else
