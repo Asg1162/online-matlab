@@ -2,7 +2,14 @@
 #include "../include/FunctionList.h"
 #include <cstdlib>
 #include "../include/Gpu.h"
+#include "../include/ExeException.h"
 
+#include "../../3rdparty/pngwriter-0.5.4/src/pngwriter.h"
+#include <time.h>
+#include <sstream>
+
+using namespace std;
+ extern std::string gCurUser;
 namespace ONLINE_MATLAB {
 
   Matrix *omSgerand(int nooutput, int noargs, Matrix **matrices)
@@ -65,4 +72,44 @@ namespace ONLINE_MATLAB {
       return U;
     }
   }
+
+  static char filePath[] = "/home/xwu3/matcloud/mysite/media/users/";
+
+  Matrix *omPlot(int nooutput, int noargs, Matrix **matrices)
+  {
+    // generate name from current time
+    time_t seconds;
+
+    seconds = time (NULL);
+
+    stringstream ss;
+
+    ss << filePath << gCurUser << "_" << seconds << ".png" ;
+    cout << "user file name is "<< ss.str() << endl;
+
+    int picWidth = 200;
+    int picLength = 300;
+    pngwriter picture(picWidth,picLength, 65535, ss.str().c_str());
+
+    if (noargs > 1)
+      throw ExeException("plot only supports one matrix for now");
+
+    if (noargs == 1)
+      {
+        // plot one matrix
+        // TODO find the maxu
+        cout << " write file." << endl;
+        OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
+        int numElements = matrices[0]->getBufferSize();
+        for (int i = 0; i != numElements; i++)
+          picture.plot(i * picLength/(float)numElements, *element++, 1.0, 0.0 ,0.0);
+      }
+
+    picture.close();
+
+    char *filename = new char[strlen(ss.str().c_str())];
+    strcpy(filename, ss.str().c_str());
+    return (Matrix *)filename;
+  }
+
 } // namespace 

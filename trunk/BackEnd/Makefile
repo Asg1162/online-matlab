@@ -40,6 +40,14 @@ INCLUDES=-I${CULA_INC_PATH} -I$(ROOTDIR)/. -I${CUDA_INC_PATH}
 GPU_LIBS=-L${CULA_LIB_PATH_64} -lcula -lcublas -lcudart
 ICE_LIBS=-L${ICE_HOME_LIB} -lIce -lIceUtil
 
+PNG_WRITER_FLAGS = -Wno-deprecated `freetype-config --cflags` `freetype-config --libs`
+PNG_WRITER_SRC = $(ROOTDIR)/../3rdparty/pngwriter-0.5.4/src
+PNG_WRITER_FLAGS += -I$(PNG_WRITER_SRC) -I/usr/include
+PNG_WRITER_FLAGS += -L$(PNG_WRITER_SRC) -L/usr/lib64 -lz -lpngwriter -lpthread -lpng
+
+INCLUDES +=  `freetype-config --cflags` `freetype-config --libs` -I$(PNG_WRITER_SRC) -I/usr/include -I$(ROOTDIR)/include
+CPP_LIBS = $(GPU_LIBS) $(ICE_LIBS) -L$(PNG_WRITER_SRC) -L/usr/lib64 -lz -lpngwriter -lpthread -lpng
+
 target: $(TARGET)
 
 unittest: $(patsubst $(ROOTDIR)/unittest/%.cpp, $(TEST_BIN_DIR)/%, $(TEST_CASE_SRC))
@@ -47,11 +55,11 @@ unittest: $(patsubst $(ROOTDIR)/unittest/%.cpp, $(TEST_BIN_DIR)/%, $(TEST_CASE_S
 
 $(TEST_BIN_DIR)/%:  $(ROOTDIR)/unittest/%.cpp $(SRC_OBJ) $(LEX_YY_O) $(YACC_TAB_O)
 	mkdir -p $(ROOTDIR)/unittest/bin
-	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O)  ${LoadBalancer_O} -lpthread -o $@ $< $(SRC_OBJ)
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(LEX_YY_O) $(YACC_TAB_O)  ${LoadBalancer_O}  $< $(SRC_OBJ) -o $@ $(CPP_LIBS) 
 
 
 $(TARGET):$(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(ROOTDIR)/Makefile ${LoadBalancer_O}
-	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(GPU_LIBS) $(ICE_LIBS) $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -lpthread -o $(TARGET)
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES)  $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -o $(TARGET)  $(CPP_LIBS)
 
 $(LEX_YY_O): $(LEX_YY_C) $(YACC_TAB_H)
 	$(CC) $(CPPFLAGS) -I$(ROOTDIR)/include -c $(LEX_YY_C) -o $(LEX_YY_O)
@@ -71,7 +79,7 @@ $(LEX_YY_C):$(LEXYA_L)
 #	$(LEX) -d lexya.l
 
 $(MAIN_O): $(ROOTDIR)/main.cpp  $(ROOTDIR)/LoadBalancer.cpp
-	$(CC) -m64 -I$(ROOTDIR)/include -I$(ROOTDIR)/. -c $< -o $(MAIN_O)
+	$(CC) -m64 -I$(ROOTDIR)/include -I$(ROOTDIR)/. $(CPPFLAGS) -c $< -o $(MAIN_O)
 
 ${LoadBalancer_O} $(ROOTDIR)/LoadBalancer.cpp: $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice
 	slice2cpp --output-dir $(ROOTDIR) $(ROOTDIR)/../LoadBalancer/LoadBalancer.ice 
@@ -80,7 +88,7 @@ ${LoadBalancer_O} $(ROOTDIR)/LoadBalancer.cpp: $(ROOTDIR)/../LoadBalancer/LoadBa
 #rules:
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp 
 	mkdir -p $(dir $@)
-	$(VERBOSE)$(CC) -m64 $(CPPFLAGS) $(INCLUDES) -I$(ROOTDIR)/include $(GPU_LIBS) -o $@ -c $<
+	$(VERBOSE)$(CC) -m64 $(CPPFLAGS) $(INCLUDES) -I$(ROOTDIR)/include $(CPP_LIBS) -o $@ -c $<
 
 
 

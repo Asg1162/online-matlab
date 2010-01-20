@@ -57,6 +57,7 @@ Matlab :: Matlab(int gpuId){
   // build the function map
   mFunctions["rand"] = omSgerand;
   mFunctions["svd"] = omSgesvd;
+  mFunctions["plot"] = omPlot;
   pthread_mutex_init(&mUserspaceLock, NULL);
 
   //  start a gpu thread
@@ -76,15 +77,24 @@ void Matlab :: newUser(std::string name){
   // TODO more robust
   pthread_mutex_lock(&mUserspaceLock);
   
-  assert(mUsers.find(name) == mUsers.end());
-  mUsers[name] = new UserSpace(this); 
+  if(mUsers.find(name) == mUsers.end())
+    mUsers[name] = new UserSpace(this); 
+  else
+    mUsers[name]->incInstances();
+
   pthread_mutex_unlock(&mUserspaceLock);
 }
 
 void Matlab :: delUser(std::string name){
   pthread_mutex_lock(&mUserspaceLock);
-  delete(mUsers[name]);
-  mUsers.erase(name);
+  assert(mUsers[name]->getNumInstances() > 0); // TODO throw exception
+
+  mUsers[name]->decInstances();
+  if (mUsers[name]->getNumInstances() == 0)  // if instance reaches to zero, delete the userspace
+    {
+      delete(mUsers[name]);
+      mUsers.erase(name);
+    }
   pthread_mutex_unlock(&mUserspaceLock);
 }
 

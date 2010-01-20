@@ -7,7 +7,8 @@ namespace ONLINE_MATLAB{
 
 
   UserSpace :: UserSpace(Matlab *parent):
-  mParent(parent)
+  mParent(parent),
+    mNumInstances(1)
 {}
 
 UserSpace :: ~UserSpace(){

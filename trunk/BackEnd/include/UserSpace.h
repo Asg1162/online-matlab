@@ -22,10 +22,25 @@ public:
   void updateVar(const char* varName, Matrix *newVal);
 
   Matrix *runFunction(char *funcName, int nooutput, int noargs, Matrix **matrix);
+  const int getNumInstances() const 
+  {
+    return mNumInstances;
+  }
+  void incInstances()
+  {
+    mNumInstances++;
+  }
+
+  void decInstances()
+  {
+    mNumInstances--;
+  }
+
  private:
   std::map<std::string, Matrix *> mVars; 
   typedef   std::map<std::string, Matrix *>::iterator varIter;
   Matlab *mParent;
+  int mNumInstances;
 };
  
 } // namespace

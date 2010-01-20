@@ -17,11 +17,12 @@ namespace ONLINE_MATLAB {
     routine name: trf, sv, qrf, svd, ls
    */
  Matrix *omSgerand(int nooutput, int noargs, Matrix **);
- Matrix *omDgerand(int nooutput, int noargs, Matrix **);
+
 
  Matrix *omSgesvd(int nooutput, int noargs, Matrix **);
 
+ Matrix *omPlot(int nooutput, int noargs, Matrix **matrices);
 
-
+    // Matrix *omDgerand(int nooutput, int noargs, Matrix **);
 
 }
