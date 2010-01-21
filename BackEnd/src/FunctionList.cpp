@@ -83,8 +83,7 @@ namespace ONLINE_MATLAB {
     seconds = time (NULL);
 
     stringstream ss;
-
-    ss << gCurUser << "_" << seconds << ".png" ;
+    ss << filePath << gCurUser << "/" << gCurUser << "_" << seconds << ".png" ;
     cout << "user file name is "<< ss.str() << endl;
 
     int picWidth = 200;
@@ -107,8 +106,10 @@ namespace ONLINE_MATLAB {
 
     picture.close();
 
-    char *filename = new char[strlen(ss.str().c_str())];
-    strcpy(filename, ss.str().c_str());
+    stringstream fns;
+    fns << gCurUser << "/" << gCurUser << "_" << seconds << ".png"; 
+    char *filename = new char[strlen(fns.str().c_str())];
+    strcpy(filename, fns.str().c_str());
     return (Matrix *)filename;
   }
 
