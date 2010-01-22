@@ -100,14 +100,15 @@ function stmt         {
           //      else if ($2->type == typeFun)
           $2->myMatrix = 0;
         }
-      freeNode($2);
 
+      freeNode($2);
       // generate the output
       Matrix *next = m;
       while(next)  {
         next->streamOut(gOutput);
         next = next->getNext();
       }
+
     }
 
 }
@@ -592,18 +593,18 @@ Matrix *execute(nodeType *p) {
            }
          case '*': 
            {
-             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) * (*execute(p->opr.op[1])); // set to 0 in order not to free memory
-             return (Matrix *)p->opr.op[0]->myMatrix;
+             p->myMatrix = *(execute(p->opr.op[0])) * (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->myMatrix;
            }
          case '+': 
            {
-             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) + (*execute(p->opr.op[1])); // set to 0 in order not to free memory
-             return (Matrix *)p->opr.op[0]->myMatrix;
+             p->myMatrix = *(execute(p->opr.op[0])) + (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->myMatrix;
            }
          case '-': 
            {
-             p->opr.op[0]->myMatrix = *(execute(p->opr.op[0])) - (*execute(p->opr.op[1])); // set to 0 in order not to free memory
-             return (Matrix *)p->opr.op[0]->myMatrix;
+             p->myMatrix = *(execute(p->opr.op[0])) - (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->myMatrix;
            }
          default:
            // TODO add more operators
