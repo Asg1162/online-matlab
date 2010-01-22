@@ -83,7 +83,7 @@ printf("addition1\n");
 //TODO: throw exception when dims do not match
 Matrix *Matrix :: operator-(Matrix const &rhs) const
 {
-	printf("in operator +\n");
+	printf("in operator -\n");
 	assert(this->getDimAt(0)==rhs.getDimAt(0));
 	assert(this->getDimAt(1)==rhs.getDimAt(1));
 
