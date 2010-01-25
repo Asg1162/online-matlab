@@ -64,6 +64,21 @@ Matlab :: Matlab(int gpuId){
   mFunctions["eye"] = omEye;
   mFunctions["ones"] = omOnes;
   mFunctions["zeros"] = omZeros;
+  mFunctions["sin"] = omSin;
+  mFunctions["cos"] = omCos;
+  mFunctions["tan"] = omTan;
+  mFunctions["cot"] = omCot;
+  mFunctions["log"] = omLog;
+  mFunctions["log2"] = omLog2;
+  mFunctions["log10"] = omLog10;
+  mFunctions["exp"] = omExp;
+  mFunctions["abs"] = omAbs;
+  mFunctions["round"] = omRound;
+  mFunctions["fix"] = omFix;
+  mFunctions["ceil"] = omCeil;
+  mFunctions["floor"] = omFloor;
+  mFunctions["sum"] = omSum;
+  mFunctions["prod"] = omProd;
   pthread_mutex_init(&mUserspaceLock, NULL);
 
   //  start a gpu thread
