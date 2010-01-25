@@ -5,6 +5,7 @@
 #include "Command.h"
 #include "cublas.h"
 #include <iostream>
+#include "ExeException.h"
 
 namespace ONLINE_MATLAB{
 
@@ -87,7 +88,12 @@ void Matlab :: newUser(std::string name){
 
 void Matlab :: delUser(std::string name){
   pthread_mutex_lock(&mUserspaceLock);
-  assert(mUsers[name]->getNumInstances() > 0); // TODO throw exception
+  if (mUsers[name]->getNumInstances() <= 0)
+    {
+      string error = "User ";
+      error += name; error += " does not exist\n";
+      throw ExeException(error);
+    }
 
   mUsers[name]->decInstances();
   if (mUsers[name]->getNumInstances() == 0)  // if instance reaches to zero, delete the userspace
