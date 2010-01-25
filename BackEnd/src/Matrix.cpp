@@ -66,7 +66,6 @@ Matrix *Matrix :: operator+(Matrix const &rhs) const
 	int dims[2];
 	dims[0] = this->getDimAt(0);
 	dims[1] = this->getDimAt(1);
-printf("addition1\n");
 	Matrix *result = new Matrix(NULL, 2, dims[0], dims[1]);
 	for(int i=0; i<dims[0]; i++){
 		for(int j=0; j<dims[1]; j++){
