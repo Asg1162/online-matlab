@@ -28,6 +28,21 @@ namespace ONLINE_MATLAB {
  Matrix *omOnes(int nooutput, int noargs, Matrix **);
 
  Matrix *omZeros(int nooutput, int noargs, Matrix **);
+ Matrix *omSin(int nooutput, int noargs, Matrix **);
+ Matrix *omCos(int nooutput, int noargs, Matrix **);
+ Matrix *omTan(int nooutput, int noargs, Matrix **);
+ Matrix *omCot(int nooutput, int noargs, Matrix **);
+ Matrix *omLog(int nooutput, int noargs, Matrix **);
+ Matrix *omLog2(int nooutput, int noargs, Matrix **);
+ Matrix *omLog10(int nooutput, int noargs, Matrix **);
+ Matrix *omExp(int nooutput, int noargs, Matrix **);
+ Matrix *omAbs(int nooutput, int noargs, Matrix **);
+ Matrix *omRound(int nooutput, int noargs, Matrix **);
+ Matrix *omFix(int nooutput, int noargs, Matrix **);
+ Matrix *omCeil(int nooutput, int noargs, Matrix **);
+ Matrix *omFloor(int nooutput, int noargs, Matrix **);
+ Matrix *omSum(int nooutput, int noargs, Matrix **);
+ Matrix *omProd(int nooutput, int noargs, Matrix **);
 
  Matrix *omSgerand(int nooutput, int noargs, Matrix **);
 

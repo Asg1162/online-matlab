@@ -286,6 +286,8 @@ Matrix *omEye(int nooutput, int noargs, Matrix **matrices){
 Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -296,6 +298,8 @@ Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
 Matrix *omCos(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -306,6 +310,8 @@ Matrix *omCos(int nooutput, int noargs, Matrix **matrices){
 Matrix *omTan(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -316,6 +322,8 @@ Matrix *omTan(int nooutput, int noargs, Matrix **matrices){
 Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -326,6 +334,8 @@ Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
 Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -336,6 +346,8 @@ Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 Matrix *omLog2(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -346,6 +358,8 @@ Matrix *omLog2(int nooutput, int noargs, Matrix **matrices){
 Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -356,6 +370,8 @@ Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
 Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -366,6 +382,8 @@ Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -376,6 +394,8 @@ Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 Matrix *omRound(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -386,6 +406,8 @@ Matrix *omRound(int nooutput, int noargs, Matrix **matrices){
 Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -396,6 +418,8 @@ Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
 Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -406,6 +430,8 @@ Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -416,6 +442,8 @@ Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
@@ -426,6 +454,8 @@ Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
 Matrix *omProd(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim1 = matrices[0]->getDimAt(0);
+	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
