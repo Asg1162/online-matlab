@@ -139,4 +139,373 @@ namespace ONLINE_MATLAB {
     return (Matrix *)filename;
   }
 
+
+Matrix *omMagic( int nooutput, int noargs, Matrix **matrices ){
+    // generate a magic square using the appropriate method
+    if(noargs != 1)
+    	throw ExeException("Hilb accepts 1 argument.\n");
+    int dim;
+    dim = (int) matrices[0]->getScalaValue();
+    if(dim < 1 || dim == 2){
+    	throw ExeException("Dimension should be a positive integer other than 2.\n");
+    }
+
+    if (dim%2 > 0)
+		return odd_order(dim);
+    else if (dim%4 == 0)  
+        return doubly_even(dim);
+	else
+		return singly_even(dim);
+}
+
+Matrix *odd_order( int n ){
+    //generate a magic square using the
+    //siamese method for any odd value n
+
+    int i, j, N3, t;
+    Matrix *m = new Matrix(NULL, 2, n, n);
+
+    N3 = (n - 3) / 2;
+    
+    for (i=1; i<=n; i++ ){
+    	for (j=1; j<=n; j++){
+			t = (i + j*2 - 2) % n;
+			m->setElementAt(i-1, j-1, (1 + t + n*((N3 + i + j)%n)) );
+    	}
+    }
+
+    m->syncToDevice();
+    return m;
+}
+
+Matrix *doubly_even( int n ){
+    //generate a magic square using the
+    //big X method for sizes 4, 8, 12, 16 ...
+
+    int i, j;
+    int nsq1 = n*n + 1;
+    int val  = 0;
+    Matrix *m = new Matrix(NULL, 2, n, n);
+
+    for (i=1; i<=n; i++ ){
+    	for (j=1; j<=n; j++){
+			val++; 
+			if ( ( ((i/2)%2 > 0) && ((j/2)%2 > 0) ) || ( ((i/2)%2 == 0) && ((j/2)%2 == 0)) )
+				m->setElementAt(i-1,j-1, nsq1 - val);
+			else
+				m->setElementAt(i-1, j-1, val);
+      	}
+    }
+
+    m->syncToDevice();
+    return m;
+}
+
+Matrix *singly_even( int n ){
+    //generate a magic square using the 
+    //LUX method for sizes  6, 10, 14 ...
+
+    int i, j, s3, t, s, m;
+    int js=0, is=0;
+    Matrix *mm = new Matrix(NULL, 2, n, n);
+   
+    m = (n - 2) / 4;
+    s = (m*2) + 1;
+    s3 = (s - 3) / 2;
+    
+    for( i=1; i<=n; i++){
+
+		if ((i%2)>0) is++;
+
+		js = 0;
+
+		for (j=1; j<=n; j++){
+			if ((j%2)>0) js++;
+
+			t = ((((is + (js*2) - 2)%s) + s*((s3 + is + js)%s))*4) + 1;
+
+			if ((i % 2) > 0){ 
+				if ( (is > m+2) || ( (is == m+2) && (js != m+1) ) || ( (is == m+1) && (js  == m+1) ) ){
+	    			if (j % 2 > 0) {
+						mm->setElementAt(i-1, j-1, t); 
+	    			} else {
+	      				mm->setElementAt(i-1, j-1, t+3); 
+	    			}
+	  			} else {
+	    			if (j % 2 > 0) {
+	      				mm->setElementAt(i-1, j-1, t+3); 
+	    			} else {
+	      				mm->setElementAt(i-1, j-1, t); 
+	    			}
+	  			}
+			} else {                                            
+	  			if (is < m+3){               
+	    			if (j % 2 > 0)
+	      				mm->setElementAt(i-1, j-1, t+1); 
+	    			else
+	      				mm->setElementAt(i-1, j-1, t+2); 
+	  			} else {
+	    			if (j % 2 > 0)
+	      				mm->setElementAt(i-1, j-1, t+2); 
+	    			else
+	      				mm->setElementAt(i-1, j-1, t+1);          
+	  			}
+			}
+		}
+	}
+    mm->syncToDevice();
+    return mm;
+}
+
+
+Matrix *omEye(int nooutput, int noargs, Matrix **matrices){
+		if(noargs != 1 && noargs != 2)
+			throw ExeException("Hilb accepts 1 or 2 argument(s).\n");
+		int dim1, dim2;
+		dim1 = (int) matrices[0]->getScalaValue();
+		if(noargs == 2)
+			dim2 = (int) matrices[1]->getScalaValue();
+		else
+			dim2 = dim1;
+
+		if(dim1 < 1 || dim2 < 1){
+			throw ExeException("Dimension should be a positive integer.\n");
+		}
+
+		Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+		for(int i=0; i<dim1 && i<dim2; i++){
+			m->setElementAt(i, i, 1);
+		}
+
+		m->syncToDevice();
+		return m;
+
+}
+
+Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omCos(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omTan(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omLog2(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omRound(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+Matrix *omProd(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+	// code goes here
+
+	m->syncFromDevice();
+	return m;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Matrix *omOnes(int nooutput, int noargs, Matrix **matrices){
+		if(noargs != 1 && noargs != 2)
+			throw ExeException("Hilb accepts 1 or 2 argument(s).\n");
+		int dim1, dim2;
+		dim1 = (int) matrices[0]->getScalaValue();
+		if(noargs == 2)
+			dim2 = (int) matrices[1]->getScalaValue();
+		else
+			dim2 = dim1;
+
+		if(dim1 < 1 || dim2 < 1){
+			throw ExeException("Dimension should be a positive integer.\n");
+		}
+
+		Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+
+		for(int i=0; i<dim1; i++){
+			for(int j=0; j<dim2; j++){
+				m->setElementAt(i, j, 1);
+			}
+		}
+
+		m->syncToDevice();
+		return m;
+
+}
+
+Matrix *omZeros(int nooutput, int noargs, Matrix **matrices){
+		if(noargs != 1 && noargs != 2)
+			throw ExeException("Hilb accepts 1 or 2 argument(s).\n");
+		int dim1, dim2;
+		dim1 = (int) matrices[0]->getScalaValue();
+		if(noargs == 2)
+			dim2 = (int) matrices[1]->getScalaValue();
+		else
+			dim2 = dim1;
+
+		if(dim1 < 1 || dim2 < 1){
+			throw ExeException("Dimension should be a positive integer.\n");
+		}
+
+		Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+		m->syncToDevice();
+		return m;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 } // namespace 
