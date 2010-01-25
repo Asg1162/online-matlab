@@ -16,8 +16,9 @@ namespace ONLINE_MATLAB {
     matrix type: ge (general), bd(bidiagonal), or(orthogonal real) tr(triangular) un(complex unary)
     routine name: trf, sv, qrf, svd, ls
    */
- Matrix *omSgerand(int nooutput, int noargs, Matrix **);
+ Matrix *omHilb(int nooutput, int noargs, Matrix **);
 
+ Matrix *omSgerand(int nooutput, int noargs, Matrix **);
 
  Matrix *omSgesvd(int nooutput, int noargs, Matrix **);
 

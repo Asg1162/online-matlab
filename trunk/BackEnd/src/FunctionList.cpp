@@ -12,6 +12,26 @@ using namespace std;
  extern std::string gCurUser;
 namespace ONLINE_MATLAB {
 
+  Matrix *omHilb(int nooutput, int noargs, Matrix **matrices){
+	//assert(dim>=1);
+	if(noargs != 1)
+			throw ExeException("Hilb accepts 1 argument.\n");
+	int dim;
+	dim = (int) matrices[0]->getScalaValue();
+	if(dim < 1){
+			throw ExeException("Dimension should be a positive integer.\n");
+	}
+	Matrix *h = new Matrix((const char *)NULL, 2, dim,  dim);
+	for(int i=0; i<dim; i++){
+		for(int j=0; j<dim; j++){
+			h->setElementAt(i, j, (OM_SUPPORT_TYPE)1/(OM_SUPPORT_TYPE)(i+j+1));
+		}
+	}
+
+	h->syncToDevice();
+	return h;
+  }
+
   Matrix *omSgerand(int nooutput, int noargs, Matrix **matrices)
 {
   assert(nooutput == 1);
@@ -32,6 +52,8 @@ namespace ONLINE_MATLAB {
   Matrix *re  = new Matrix(NULL, noargs, dims, elements);
     
   re->setNext(0);
+
+  re->syncToDevice();
   return re;
 }
 
@@ -63,12 +85,16 @@ namespace ONLINE_MATLAB {
     if (nooutput == 1)
       {
         delete U;  delete VT;
+		S->syncFromDevice();
         return S;
       }
     else{
       U->setNext(S);
+	  U->syncFromDevice();
       S->setNext(VT);
+	  S->syncFromDevice();
       VT->setNext(NULL);
+	  VT->syncFromDevice();
       return U;
     }
   }
