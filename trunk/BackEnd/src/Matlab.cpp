@@ -60,6 +60,10 @@ Matlab :: Matlab(int gpuId){
   mFunctions["svd"] = omSgesvd;
   mFunctions["plot"] = omPlot;
   mFunctions["hilb"] = omHilb;
+  mFunctions["magic"] = omMagic;
+  mFunctions["eye"] = omEye;
+  mFunctions["ones"] = omOnes;
+  mFunctions["zeros"] = omZeros;
   pthread_mutex_init(&mUserspaceLock, NULL);
 
   //  start a gpu thread
