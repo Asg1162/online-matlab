@@ -35,6 +35,7 @@ extern int yy_flex_debug;
 extern Matlab *gMatlab;
  extern std::string gCurUser;
  extern std::stringstream gOutput;
+ extern bool gEnableOutput;
 %}
 
 
@@ -103,12 +104,14 @@ function stmt         {
 
       freeNode($2);
       // generate the output
-      Matrix *next = m;
-      while(next)  {
-        next->streamOut(gOutput);
-        next = next->getNext();
-      }
-
+      if (gEnableOutput)
+        {
+          Matrix *next = m;
+          while(next)  {
+            next->streamOut(gOutput);
+            next = next->getNext();
+          }
+        }
     }
 
 }
@@ -127,12 +130,24 @@ stmt:
         | expr ';'                       { 
           $$ = $1; 
           }
+        | expr {
+          gEnableOutput = true;
+          $$ = $1; 
+        }
 // TODO combine the following two cases
         | VARIABLE '=' expr ';'          {  
           $$ = opr('=', 2, id($1), $3); 
           }
         | MATRIX_LIST '=' expr ';'        { 
           $$ = opr('=', 2, matrix_list($1), $3);
+          }
+        | VARIABLE '=' expr         { 
+          $$ = opr('=', 2, id($1), $3); 
+          gEnableOutput = true;
+          }
+        | MATRIX_LIST '=' expr     { 
+          $$ = opr('=', 2, matrix_list($1), $3);
+          gEnableOutput = true;
           }
 
         ;
@@ -151,6 +166,10 @@ expr:
           }
         | MATRIX_LIST   { 
           $$ = matrix_list($1); 
+          free($1); 
+          }
+        | VARIABLE '\''    { 
+          $$ = opr('\'', 1, id($1));
           free($1); 
           }
         | VARIABLE     { 
@@ -606,6 +625,11 @@ Matrix *execute(nodeType *p) {
          case '-': 
            {
              p->myMatrix = *(execute(p->opr.op[0])) - (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->myMatrix;
+           }
+         case '\'':
+           {
+             p->myMatrix = (execute(p->opr.op[0]))->transpose();
              return (Matrix *)p->myMatrix;
            }
          default:
