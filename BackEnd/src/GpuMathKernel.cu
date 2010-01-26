@@ -61,6 +61,20 @@ OmgCot_kernel(int numElement, const float *bufferin, float *bufferout)
 
 
 __global__ void
+OmgLog_kernel(int numElement, const float *bufferin, float *bufferout)
+{
+  // TODO make it u24
+  int blockId = blockIdx.y * gridDim.x +  blockIdx.x;
+  int tid = threadIdx.x + blockId * blockDim.x;
+  int step = gridDim.x * blockDim.x;
+
+    //blockIdx.y * step + blockIdx.x * gridDim.x * blockDim.x;
+  for (int gid = tid; gid < numElement; gid += step)
+    if (gid < numElement)
+      bufferout[gid] = logf(bufferin[gid]);
+}
+
+__global__ void
 OmgLog2_kernel(int numElement, const float *bufferin, float *bufferout)
 {
   // TODO make it u24
@@ -116,6 +130,19 @@ OmgAbs_kernel(int numElement, const float *bufferin, float *bufferout)
       bufferout[gid] = fabsf(bufferin[gid]);
 }
 
+__global__ void
+OmgFix_kernel(int numElement, const float *bufferin, float *bufferout)
+{
+  // TODO make it u24
+  int blockId = blockIdx.y * gridDim.x +  blockIdx.x;
+  int tid = threadIdx.x + blockId * blockDim.x;
+  int step = gridDim.x * blockDim.x;
+
+    //blockIdx.y * step + blockIdx.x * gridDim.x * blockDim.x;
+  for (int gid = tid; gid < numElement; gid += step)
+    if (gid < numElement)
+      bufferout[gid] = truncf(bufferin[gid]);
+}
 
 __global__ void
 OmgCeil_kernel(int numElement, const float *bufferin, float *bufferout)
@@ -143,4 +170,18 @@ OmgFloor_kernel(int numElement, const float *bufferin, float *bufferout)
   for (int gid = tid; gid < numElement; gid += step)
     if (gid < numElement)
       bufferout[gid] = floorf(bufferin[gid]);
+}
+
+__global__ void
+OmgRound_kernel(int numElement, const float *bufferin, float *bufferout)
+{
+  // TODO make it u24
+  int blockId = blockIdx.y * gridDim.x +  blockIdx.x;
+  int tid = threadIdx.x + blockId * blockDim.x;
+  int step = gridDim.x * blockDim.x;
+
+    //blockIdx.y * step + blockIdx.x * gridDim.x * blockDim.x;
+  for (int gid = tid; gid < numElement; gid += step)
+    if (gid < numElement)
+      bufferout[gid] = rintf(bufferin[gid]);
 }

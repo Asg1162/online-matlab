@@ -61,6 +61,13 @@ extern "C" void omgCot(int numElement, const float *bufferin, float *bufferout)
   OmgCot_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
 }
 
+extern "C" void omgLog(int numElement, const float *bufferin, float *bufferout)
+{
+  dim3 threads(1,1,1);
+  dim3 grid(1,1,1);
+  getDimension(numElement, &(threads.x), &(grid.x), &(grid.y));
+  OmgLog_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
+}
 
 extern "C" void omgLog2(int numElement, const float *bufferin, float *bufferout)
 {
@@ -95,6 +102,13 @@ extern "C" void omgAbs(int numElement, const float *bufferin, float *bufferout)
   OmgAbs_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
 }
 
+extern "C" void omgFix(int numElement, const float *bufferin, float *bufferout)
+{
+  dim3 threads(1,1,1);
+  dim3 grid(1,1,1);
+  getDimension(numElement, &(threads.x), &(grid.x), &(grid.y));
+  OmgFix_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
+}
 
 extern "C" void omgCeil(int numElement, const float *bufferin, float *bufferout)
 {
@@ -110,4 +124,12 @@ extern "C" void omgFloor(int numElement, const float *bufferin, float *bufferout
   dim3 grid(1,1,1);
   getDimension(numElement, &(threads.x), &(grid.x), &(grid.y));
   OmgFloor_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
+}
+
+extern "C" void omgRound(int numElement, const float *bufferin, float *bufferout)
+{
+  dim3 threads(1,1,1);
+  dim3 grid(1,1,1);
+  getDimension(numElement, &(threads.x), &(grid.x), &(grid.y));
+  OmgRound_kernel<<<grid, threads>>>(numElement, bufferin,bufferout);
 }
