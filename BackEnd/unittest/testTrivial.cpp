@@ -56,7 +56,7 @@ int main(int argc, char **argv)
   std::string output;
 
   runtest("a = [3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15 3.14 3.15];", output, username);
-  runtest("b = sin(a);" , output, username); // wrong syntax
+  runtest("b = sin(a')" , output, username); // wrong syntax
  
   //  yyin = stdin; //std::cin; //fopen("input", "r");
   /*      yy_buffer_state *my_string_buffer  = yy_scan_string(input.c_str());

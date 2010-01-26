@@ -12,6 +12,7 @@ extern yy_buffer_state *yy_scan_string( const char *yy_str );
 void yy_delete_buffer (yy_buffer_state *b );
 
 std::stringstream gOutput;
+bool gEnableOutput;
 
 namespace ONLINE_MATLAB{
 
@@ -19,6 +20,7 @@ namespace ONLINE_MATLAB{
     {
       lock();
       gCurUser = mCurUser;
+      gEnableOutput = false;
       yy_buffer_state *my_string_buffer  = yy_scan_string(mInput);
       try {
         yyparse();

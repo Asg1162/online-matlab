@@ -165,6 +165,21 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
   return result;
 }
 
+ Matrix *Matrix::transpose()
+ {
+   if (this->getDim() != 2)
+     throw ExeException("Matrix transpose must be two-dimensional.");
+
+   Matrix *m = new Matrix(NULL, 2, this->getDimAt(1), this->getDimAt(0));
+
+   for (int i = 0; i != getDimAt(1); i++)
+     for (int j = 0; j != getDimAt(0); j++)
+       m->setElementAt(i,j, this->getElementAt(j,i));
+   
+   m->syncToDevice();
+   return m;
+ }
+
  void Matrix::streamOut(stringstream &out)
  {
    out << "<br>" << endl <<  getName() << " =" << "<br>"  << endl;

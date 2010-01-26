@@ -22,6 +22,8 @@ class Matrix : public Atom {
     Matrix *operator-(Matrix const &rhs) const;
     Matrix *operator*(Matrix const &rhs) const;
 
+    Matrix *transpose();
+
     Matrix *getNext() const
     {
       return mNext;
