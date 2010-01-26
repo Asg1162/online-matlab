@@ -35,12 +35,22 @@ namespace ONLINE_MATLAB {
   Matrix *omSgerand(int nooutput, int noargs, Matrix **matrices)
 {
   assert(nooutput == 1);
-  int dims[noargs];
+  int dims[noargs+1];
   int buffersize=1;
-  for (int i = 0; i != noargs; i++)
+  if (noargs == 1)
     {
-      dims[i] = (int)matrices[i]->getScalaValue();
-      buffersize *= dims[i];
+      dims[0] = 1;
+      dims[1] = (int)matrices[0]->getScalaValue();
+      buffersize = dims[1];
+      noargs++; // make it to two dimension
+    }
+  else
+    {
+      for (int i = 0; i != noargs; i++)
+        {
+          dims[i] = (int)matrices[i]->getScalaValue();
+          buffersize *= dims[i];
+        }
     }
 
   OM_SUPPORT_TYPE elements[buffersize];
@@ -288,13 +298,15 @@ Matrix *omEye(int nooutput, int noargs, Matrix **matrices){
  extern "C" void omgCos(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgTan(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgCot(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgLog(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgLog2(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgLog10(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgExp(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgAbs(int numElement, const float *bufferin, float *bufferout);
-
+ extern "C" void omgFix(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgCeil(int numElement, const float *bufferin, float *bufferout);
  extern "C" void omgFloor(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgRound(int numElement, const float *bufferin, float *bufferout);
 
 Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
@@ -354,7 +366,7 @@ Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgLog(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
@@ -386,7 +398,7 @@ Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
 
 Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("exp accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
@@ -398,7 +410,7 @@ Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 }
 Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("abs accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
@@ -408,33 +420,34 @@ Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omRound(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("round accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgRound(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
 Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("fix accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgFix(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));    
 	m->syncFromDevice();
 	return m;
 }
 Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("ceil accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
@@ -446,7 +459,7 @@ Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 }
 Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("floor accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
@@ -457,32 +470,80 @@ Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 	return m;
 }
 
+
+// CPU version
 Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
-	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+	if(noargs != 1 && noargs != 2)
+			throw ExeException("sum accepts 1 or 2 argument(s).\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
-	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
+    Matrix *m;
 	// code goes here
+    if (dim1 == 1 || dim2 == 1) // if it is a vector
+      {
+        m = new Matrix(NULL, 2, 1, 1);  //  the result is a vector
+        OM_SUPPORT_TYPE total = 0.0;
+        OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
+        for (int i = 0; i != matrices[0]->getBufferSize(); i++)
+          total += *element++;
+        m->setScalaValue(total);
+      }
+    else
+      {
+        OM_SUPPORT_TYPE total[dim2];
+        for (int i = 0; i != dim2; i++)
+          {
+            total[i] = 0.0;
+            for (int j = 0; j != dim1; j++)
+              {
+                total[i] += matrices[0]->getElementAt(j,i);
+              }
+          }
+        int dims[2]; dims[0] = 1; dims[1] = dim2;
+        m = new Matrix(NULL, 2, dims, total);
+      }
 
-	m->syncFromDevice();
+	m->syncToDevice();
 	return m;
 }
+
 Matrix *omProd(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("prod accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
-	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
+    Matrix *m;
 
 	// code goes here
+    if (dim1 == 1 || dim2 == 1) // if it is a vector
+      {
+        m = new Matrix(NULL, 2, 1, 1);  //  the result is a vector
+        OM_SUPPORT_TYPE total = 1.0;
+        OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
+        for (int i = 0; i != matrices[0]->getBufferSize(); i++)
+          total *= *element++;
+        m->setScalaValue(total);
+      }
+    else
+      {
+        OM_SUPPORT_TYPE total[dim2];
+        for (int i = 0; i != dim2; i++)
+          {
+            total[i] = 1.0;
+            for (int j = 0; j != dim1; j++)
+              {
+                total[i] *= matrices[0]->getElementAt(j,i);
+              }
+          }
+        int dims[2]; dims[0] = 1; dims[1] = dim2;
+        m = new Matrix(NULL, 2, dims, total);
+      }
 
-	m->syncFromDevice();
+	m->syncToDevice();
 	return m;
+
 }
-
-
 
 
 

@@ -44,6 +44,16 @@ using namespace std;
 Matrix :: ~Matrix(){
 }
 
+
+/* Matrix::Matrix(const Matrix &rhs): // copy constructor
+  Atom(dim, dims, elements),
+    mNext(0),
+    mName(name)
+
+  {
+    
+  }*/
+
 /*int Matrix :: getDim(){
   return dim;
 }*/

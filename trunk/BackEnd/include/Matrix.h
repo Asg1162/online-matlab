@@ -10,6 +10,8 @@ class Matrix : public Atom {
     //    Matrix();
     Matrix(const char *name, int dim, ...);
     Matrix(const char *name, int dim, int *dims, OM_SUPPORT_TYPE *elements);
+
+
   //    Matrix();
     ~Matrix();
 
@@ -41,6 +43,8 @@ class Matrix : public Atom {
     void streamOut(std::stringstream &out);
 
   private:
+    Matrix(const Matrix &rhs); // copy constructor not supported yet
+
     Matrix *mNext;  // currently used when the function has multiple returns
     const char *mName;
 };
