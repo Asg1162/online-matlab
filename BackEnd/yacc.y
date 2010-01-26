@@ -88,7 +88,7 @@ function stmt         {
     {
       char *filepath = (char *)m; //static_cast<char *>(m);
       gOutput << filepath;
-      delete filepath;
+      delete [] filepath;
     }
   else 
     {
@@ -145,10 +145,7 @@ stmt:
 
 
 expr:
-          NUMBER               { 
-            $$ = con($1); 
-          }
-        | MATRIX		{ 
+        MATRIX		{ 
           $$ = matrix($1);   
           free($1);  
           }
@@ -175,7 +172,7 @@ expr:
         | expr '/' expr  { 
           $$ = opr('/', 2, $1, $3); 
           }
-        |VARIABLE '(' ')'  {
+        | VARIABLE '(' ')'  {
           assert(0);  // TODO
           $$ = func($1, 0);
          }
@@ -183,6 +180,10 @@ expr:
           $$ = func($1, $3);
           g_arguments = 0;
           } // function
+        | NUMBER      { 
+            $$ = con($1); 
+          }
+
 
 /*      | expr '<' expr         { $$ = opr('<', 2, $1, $3); }
         | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
@@ -271,11 +272,12 @@ nodeType *matrix(char *m){
 
   nodeType *p  = allocateNode(sizeof(nodeType), typeVec);
 
-  p->vec.dim = numRows>1 ? 2: 1;
+  //  p->vec.dim = numRows>1 ? 2: 1;
+  p->vec.dim = 2; //numRows>1 ? 2: 1;
   p->vec.dims = (int *)malloc(sizeof(int)* p->vec.dim);
-  if (p->vec.dim == 1)
-    p->vec.dims[0] = numCol;
-  else
+  //  if (p->vec.dim == 1)
+  //    p->vec.dims[0] = numCol;
+  //  else
     {
       p->vec.dims[0] = numRows;      
       p->vec.dims[1] = numCol;
@@ -517,7 +519,7 @@ void freeNode(nodeType *p) {
 void yyerror(char *s) {
     fprintf(stdout, "%s\n", s);
     string reason(s);
-    
+    throw (ParseException(s));
 }
 
 //int main(void) {

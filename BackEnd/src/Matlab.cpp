@@ -6,6 +6,7 @@
 #include "cublas.h"
 #include <iostream>
 #include "ExeException.h"
+#include <cutil_inline.h>
 
 namespace ONLINE_MATLAB{
 
@@ -15,6 +16,7 @@ namespace ONLINE_MATLAB{
 extern "C" void 
   launchGpu_thread(void *q) 
   {
+    cutilDeviceInit(0, NULL);
     int r = initGpu(0); // TODO pass gpuid 
     //    cublasInit();
     if (r != 0)
@@ -134,7 +136,12 @@ UserSpace* Matlab :: getUser(std::string name){
  OM_FUNCTION Matlab :: getFunction(const std::string &funcName) 
    {
      // TODO throw exception
-     assert(mFunctions.find(funcName) != mFunctions.end());
+     if (mFunctions.find(funcName) == mFunctions.end())
+       {
+         string error("function ");
+         error += funcName; error += " not found.";
+         throw ExeException(error);
+       }
 
      return mFunctions[funcName];
    }

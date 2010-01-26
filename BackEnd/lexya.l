@@ -37,17 +37,14 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
                 return VARIABLE;
              }
 
+[-()<>=+*/;,{}.] {
+                return *yytext;
+             }
 
 {numeric}    {
                 yylval.nuValue = atof(yytext);
                 return NUMBER;
              }
-
-
-[-()<>=+*/;,{}.] {
-                return *yytext;
-             }
-
 
 {space}    {  
   ;       /* ignore whitespace */
@@ -63,6 +60,9 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
    }  /* otherwise spew warnings */
 
 %%
+
+
+
 
 int yywrap(void) {
     return 1;

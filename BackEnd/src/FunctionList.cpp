@@ -133,7 +133,7 @@ namespace ONLINE_MATLAB {
     picture.close();
 
     stringstream fns;
-    fns << gCurUser << "/" << gCurUser << "_" << seconds << ".png"; 
+    fns << gCurUser << "/" << gCurUser << "_" << seconds << ".png" << endl; 
     char *filename = new char[strlen(fns.str().c_str())];
     strcpy(filename, fns.str().c_str());
     return (Matrix *)filename;
@@ -283,54 +283,69 @@ Matrix *omEye(int nooutput, int noargs, Matrix **matrices){
 
 }
 
+// declaration, forward
+ extern "C" void omgSin(int maxthread,const float *bufferin, float *bufferout);
+ extern "C" void omgCos(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgTan(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgCot(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgLog2(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgLog10(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgExp(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgAbs(int numElement, const float *bufferin, float *bufferout);
+
+ extern "C" void omgCeil(int numElement, const float *bufferin, float *bufferout);
+ extern "C" void omgFloor(int numElement, const float *bufferin, float *bufferout);
+
 Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("sin accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
-	// code goes here
-
+    omgSin(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omCos(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+      throw ExeException("cos accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgCos(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omTan(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("tan accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgTan(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
 Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("cot accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgCot(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
@@ -343,15 +358,16 @@ Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omLog2(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
-			throw ExeException("Hilb accepts 1 argument.\n");
+			throw ExeException("log2 accepts 1 argument.\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgLog2(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
@@ -363,10 +379,11 @@ Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgLog10(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
@@ -375,7 +392,7 @@ Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgExp(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
@@ -387,7 +404,7 @@ Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgAbs(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
@@ -423,7 +440,7 @@ Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgCeil(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
@@ -435,10 +452,11 @@ Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 	Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 
 	// code goes here
-
+    omgFloor(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
 	return m;
 }
+
 Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
 	if(noargs != 1)
 			throw ExeException("Hilb accepts 1 argument.\n");
