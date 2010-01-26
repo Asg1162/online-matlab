@@ -35,10 +35,20 @@ CULA_LIB_PATH_64 =$(CULA_INSTALL_PATH)/lib64
 
 CUDA_INSTALL_PATH ?= /usr/local/cuda
 CUDA_INC_PATH = $(CUDA_INSTALL_PATH)/include
+CUDASDK_INSTALL_PATH ?=/home/yzhang25/NVIDIA_GPU_Computing_SDK/C
+CUDASDK_INC_PATH=$(CUDASDK_INSTALL_PATH)/common/inc
+CUDA_LIB_PATH=/usr/local/cuda/lib64
+CUDASDK_LIB_PATH=$(CUDASDK_INSTALL_PATH)/common/lib/linux
+NVCC=nvcc
+
 
 INCLUDES=-I${CULA_INC_PATH} -I$(ROOTDIR)/. -I${CUDA_INC_PATH}
-GPU_LIBS=-L${CULA_LIB_PATH_64} -lcula -lcublas -lcudart
+GPU_LIBS=-L${CULA_LIB_PATH_64} -L$(CUDA_LIB_PATH) -L$(CUDASDK_LIB_PATH) -L$(CUDASDK_INSTALL_PATH)/lib  -lcula -lcublas -lcudart -lcutil
 ICE_LIBS=-L${ICE_HOME_LIB} -lIce -lIceUtil
+
+CU_FILE=$(ROOTDIR)/src/GpuMath.cu
+CU_KERNELFILE=$(ROOTDIR)/src/GpuMathKernel.cu
+CU_O=$(OBJ_DIR)/GpuMath_cu.o
 
 PNG_WRITER_FLAGS = -Wno-deprecated `freetype-config --cflags` `freetype-config --libs`
 PNG_WRITER_SRC = $(ROOTDIR)/../3rdparty/pngwriter-0.5.4/src
@@ -52,14 +62,17 @@ target: $(TARGET)
 
 unittest: $(patsubst $(ROOTDIR)/unittest/%.cpp, $(TEST_BIN_DIR)/%, $(TEST_CASE_SRC))
 
+$(CU_O) : $(CU_FILE) $(CU_KERNELFILE)
+	$(NVCC) --compiler-options -fno-strict-aliasing -g -I. -I$(CUDA_INC_PATH) -I$(CUDASDK_INC_PATH) -DUNIX    -o $(CU_O) -c $(CU_FILE)
 
-$(TEST_BIN_DIR)/%:  $(ROOTDIR)/unittest/%.cpp $(SRC_OBJ) $(LEX_YY_O) $(YACC_TAB_O)
+
+$(TEST_BIN_DIR)/%:  $(ROOTDIR)/unittest/%.cpp $(SRC_OBJ) $(LEX_YY_O) $(YACC_TAB_O) $(CU_O)
 	mkdir -p $(ROOTDIR)/unittest/bin
-	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(LEX_YY_O) $(YACC_TAB_O)  ${LoadBalancer_O}  $< $(SRC_OBJ) -o $@ $(CPP_LIBS) 
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES) $(LEX_YY_O) $(YACC_TAB_O)  ${LoadBalancer_O}  $< $(SRC_OBJ) $(CU_O) -o $@ $(CPP_LIBS) 
+$
 
-
-$(TARGET):$(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(ROOTDIR)/Makefile ${LoadBalancer_O}
-	$(CC) -m64 $(CPPFLAGS) $(INCLUDES)  $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) ${LoadBalancer_O} -o $(TARGET)  $(CPP_LIBS)
+$(TARGET):$(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(ROOTDIR)/Makefile ${LoadBalancer_O} $(CU_O)
+	$(CC) -m64 $(CPPFLAGS) $(INCLUDES)  $(LEX_YY_O) $(YACC_TAB_O) $(MAIN_O) $(SRC_OBJ) $(CU_O) ${LoadBalancer_O} -o $(TARGET)  $(CPP_LIBS)
 
 $(LEX_YY_O): $(LEX_YY_C) $(YACC_TAB_H)
 	$(CC) $(CPPFLAGS) -I$(ROOTDIR)/include -c $(LEX_YY_C) -o $(LEX_YY_O)
@@ -74,7 +87,7 @@ $(YACC_TAB_C) $(YACC_TAB_H): $(YACC_Y)
 	$(YACC) -d -o $(YACC_TAB_C) $(YACC_Y)
 
 $(LEX_YY_C):$(LEXYA_L)
-	$(LEX) -o $(LEX_YY_C) $(LEXYA_L)
+	$(LEX) -d -o $(LEX_YY_C) $(LEXYA_L)
 
 #	$(LEX) -d lexya.l
 
@@ -88,7 +101,7 @@ ${LoadBalancer_O} $(ROOTDIR)/LoadBalancer.cpp: $(ROOTDIR)/../LoadBalancer/LoadBa
 #rules:
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp 
 	mkdir -p $(dir $@)
-	$(VERBOSE)$(CC) -m64 $(CPPFLAGS) $(INCLUDES) -I$(ROOTDIR)/include $(CPP_LIBS) -o $@ -c $<
+	$(VERBOSE)$(CC) -m64 $(CPPFLAGS) $(INCLUDES) -I$(ROOTDIR)/include -I$(CUDASDK_INC_PATH) $(CPP_LIBS) -o $@ -c $<
 
 
 
