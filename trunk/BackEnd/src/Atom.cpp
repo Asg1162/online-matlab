@@ -90,7 +90,7 @@ Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
           mHostBuffer[i] = elements[i];
         }
     }
-
+  mInitialized = true;
   // sync with device buffer
   cublasSetVector(mBufSize , sizeof(OM_SUPPORT_TYPE), mHostBuffer, 1, mDvceBuffer, 1);
 }
@@ -118,7 +118,7 @@ void Atom :: setScalaValue(OM_SUPPORT_TYPE v){
 }
 
 
-OM_SUPPORT_TYPE Atom :: getScalaValue(){
+OM_SUPPORT_TYPE Atom :: getScalaValue() const{
   return *mHostBuffer;
 }
 

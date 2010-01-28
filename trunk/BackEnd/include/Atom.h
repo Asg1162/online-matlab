@@ -31,7 +31,7 @@ public:
   void syncToDevice() ;
 
   void setScalaValue(OM_SUPPORT_TYPE v);
-  OM_SUPPORT_TYPE getScalaValue();
+  OM_SUPPORT_TYPE getScalaValue() const;
     bool initialized() const 
     { return mInitialized;}
     void setInitialized(bool b)
