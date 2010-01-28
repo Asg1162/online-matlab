@@ -84,7 +84,7 @@ Matrix *Matrix :: operator+(Matrix const &rhs) const
 	}
 
 	result->syncToDevice();
-
+    result->setInitialized(true);
 	return result;
 
 }
@@ -108,7 +108,7 @@ printf("addition1\n");
 	}
 
 	result->syncToDevice();
-
+    result->setInitialized(true);
 	return result;
 
 }
@@ -131,51 +131,45 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
 
   Matrix *result;
 
-  if (this->getDimAt(0) == this->getDimAt(1) && this->getDimAt(1) == 1){
-	result = new Matrix(NULL, 2, rhs.getDimAt(0), rhs.getDimAt(1));
-	cublasSaxpy(rhs.getDimAt(0)*rhs.getDimAt(1), const_cast<OM_SUPPORT_TYPE>(this->getScalaValue()), rhs.getDevicePtr(), 1, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), 1);
-	if (cublasGetError() != CUBLAS_STATUS_SUCCESS){
+  if (this->getDimAt(0) == this->getDimAt(1) && this->getDimAt(1) == 1)
+    {
+      result = new Matrix(NULL, 2, rhs.getDimAt(0), rhs.getDimAt(1));
+      result->syncToDevice();
+      cublasSaxpy(rhs.getBufferSize(), getScalaValue(), rhs.getDevicePtr(), 1, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), 1);
+      if (cublasGetError() != CUBLAS_STATUS_SUCCESS){
 		throw ExeException("Internal error during multiplication.");
-	}
-	result->syncFromDevice(); 
-  } else if(rhs.getDimAt(0) == rhs.getDimAt(1) && rhs.getDimAt(1) == 1){
-		
-
-
-  } else {
-		  if (this->getDimAt(1) != rhs.getDimAt(0))
-			throw ExeException("Dimension mismatch in matrix multiply");
-
-		  int dims[2];
-		  dims[0] = this->getDimAt(0);
-		  dims[1] = rhs.getDimAt(1);
-		  result = new Matrix(NULL, 2, dims[0], dims[1]);  
-
-#if 0
-		  int i = 0;
-		  for (int x = 0; x != this->getDimAt(0); x++)
-			for (int y = 0; y != rhs.getDimAt(1); y++)
-			  {
-				OM_SUPPORT_TYPE element = 0.0;
-				for (int z = 0; z != this->getDimAt(1); z++)
-				  {
-					element += this->getElementAt(x, z) * rhs.getElementAt(z, y);
-				  }
-				result->setElementAt(x, y, element);
-			  }
-#else
-
-		  cublasSgemm('n', 'n', getDimAt(0), rhs.getDimAt(1), getDimAt(1), 1.0, getDevicePtr(), getDimAt(0), rhs.getDevicePtr(), rhs.getDimAt(0), 0.0, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), result->getDimAt(0));
-
-		  assert(cublasGetError() == CUBLAS_STATUS_SUCCESS);
-
-		  result->syncFromDevice(); 
-
-#endif
+      }
+      result->syncFromDevice(); 
+    } 
+  else if(rhs.getDimAt(0) == rhs.getDimAt(1) && rhs.getDimAt(1) == 1)
+    {
+      result = new Matrix(NULL, 2, getDimAt(0), getDimAt(1));
+      result->syncToDevice();
+      cublasSaxpy(this->getBufferSize(), rhs.getScalaValue(), this->getDevicePtr(), 1, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), 1);
+      if (cublasGetError() != CUBLAS_STATUS_SUCCESS){
+		throw ExeException("Internal error during multiplication.");
+      }
+      result->syncFromDevice(); 
+    }
+  else {
+    if (this->getDimAt(1) != rhs.getDimAt(0))
+      throw ExeException("Dimension mismatch in matrix multiply");
+    
+    int dims[2];
+    dims[0] = this->getDimAt(0);
+    dims[1] = rhs.getDimAt(1);
+    result = new Matrix(NULL, 2, dims[0], dims[1]);  
+    
+    
+    cublasSgemm('n', 'n', getDimAt(0), rhs.getDimAt(1), getDimAt(1), 1.0, getDevicePtr(), getDimAt(0), rhs.getDevicePtr(), rhs.getDimAt(0), 0.0, const_cast<OM_SUPPORT_TYPE *>(result->getDevicePtr()), result->getDimAt(0));
+    
+    assert(cublasGetError() == CUBLAS_STATUS_SUCCESS);
+    
+    result->syncFromDevice(); 
+    
   }
-  // TODO do the multiplication!!!
-  //  result->setScalaValue(3.14);
-  printf("do the mulplication.\n");
+
+  result->setInitialized(true);
   return result;
 }
 
@@ -191,6 +185,7 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
        m->setElementAt(i,j, this->getElementAt(j,i));
    
    m->syncToDevice();
+   m->setInitialized(true);
    return m;
  }
 

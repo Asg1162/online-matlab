@@ -46,6 +46,7 @@ extern Matlab *gMatlab;
   char *matrix_list;
   char *varName;                /* symbol table index */
     nodeType *nPtr;             /* node pointer */
+  char *
 
 };
 
@@ -53,6 +54,8 @@ extern Matlab *gMatlab;
 %token <matrix> MATRIX
 %token <matrix_list> MATRIX_LIST
 %token <varName> VARIABLE
+%token <indexRange> INDEX_RANGE
+
  //%token <nPtr> NUMBER VARIABLE 
 %token COMMA
 

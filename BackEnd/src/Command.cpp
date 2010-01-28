@@ -33,6 +33,10 @@ namespace ONLINE_MATLAB{
            // TODO           e.cleanup();  a virtual function to do clean up according to real type
            cout << "inside exception handling " << mOutput << endl;
          }
+      catch(...)
+        {
+          mOutput = "Internal Error";
+        }
       yy_delete_buffer (my_string_buffer);
       signal();
       unlock();

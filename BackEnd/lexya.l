@@ -4,6 +4,7 @@ space	[ \t\n]+
 space1	[ \t\n]
 row	{space}?{numeric}({space}{numeric})*{space}?
 matrix_item  [ ]*{word}[ ]*
+index_range {numeric}?{space}?:({space}?{numeric}:)?{numeric}?
 
 %{
 #include <stdlib.h>
@@ -45,7 +46,11 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
                 yylval.nuValue = atof(yytext);
                 return NUMBER;
              }
-
+{index_range}  {
+                yylval.nuValue = atof(yytext);
+                return INDEX_RANGE;
+ 
+             }
 {space}    {  
   ;       /* ignore whitespace */
 }

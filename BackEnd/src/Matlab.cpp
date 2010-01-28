@@ -81,6 +81,8 @@ Matlab :: Matlab(int gpuId){
   mFunctions["floor"] = omFloor;
   mFunctions["sum"] = omSum;
   mFunctions["prod"] = omProd;
+  mFunctions["min"] = omSMin;
+
   pthread_mutex_init(&mUserspaceLock, NULL);
 
   //  start a gpu thread
@@ -137,11 +139,7 @@ UserSpace* Matlab :: getUser(std::string name){
    {
      // TODO throw exception
      if (mFunctions.find(funcName) == mFunctions.end())
-       {
-         string error("function ");
-         error += funcName; error += " not found.";
-         throw ExeException(error);
-       }
+         return 0;
 
      return mFunctions[funcName];
    }

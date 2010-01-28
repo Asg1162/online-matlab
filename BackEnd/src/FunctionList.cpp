@@ -96,15 +96,19 @@ namespace ONLINE_MATLAB {
       {
         delete U;  delete VT;
 		S->syncFromDevice();
+        S->setInitialized(true);
         return S;
       }
     else{
       U->setNext(S);
 	  U->syncFromDevice();
+      U->setInitialized(true);
       S->setNext(VT);
 	  S->syncFromDevice();
+      S->setInitialized(true);
       VT->setNext(NULL);
 	  VT->syncFromDevice();
+      VT->setInitialized(true);      
       return U;
     }
   }
@@ -208,6 +212,7 @@ Matrix *doubly_even( int n ){
     }
 
     m->syncToDevice();
+    m->setInitialized(true);
     return m;
 }
 
@@ -264,6 +269,7 @@ Matrix *singly_even( int n ){
 		}
 	}
     mm->syncToDevice();
+    mm->setInitialized(true);
     return mm;
 }
 
@@ -289,6 +295,7 @@ Matrix *omEye(int nooutput, int noargs, Matrix **matrices){
 		}
 
 		m->syncToDevice();
+        m->setInitialized(true);
 		return m;
 
 }
@@ -317,6 +324,7 @@ Matrix *omSin(int nooutput, int noargs, Matrix **matrices){
 
     omgSin(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -330,6 +338,7 @@ Matrix *omCos(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgCos(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -343,6 +352,7 @@ Matrix *omTan(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgTan(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
@@ -355,6 +365,7 @@ Matrix *omCot(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgCot(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -368,6 +379,7 @@ Matrix *omLog(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgLog(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -381,6 +393,7 @@ Matrix *omLog2(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgLog2(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
@@ -393,6 +406,7 @@ Matrix *omLog10(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgLog10(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -406,6 +420,7 @@ Matrix *omExp(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgExp(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
@@ -418,6 +433,7 @@ Matrix *omAbs(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgAbs(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -431,6 +447,7 @@ Matrix *omRound(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgRound(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
@@ -443,6 +460,7 @@ Matrix *omFix(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgFix(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));    
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
@@ -455,6 +473,7 @@ Matrix *omCeil(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgCeil(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
@@ -467,6 +486,7 @@ Matrix *omFloor(int nooutput, int noargs, Matrix **matrices){
 	// code goes here
     omgFloor(matrices[0]->getBufferSize(), matrices[0]->getDevicePtr(), const_cast<float *>(m->getDevicePtr()));
 	m->syncFromDevice();
+    m->setInitialized(true);
 	return m;
 }
 
@@ -505,50 +525,120 @@ Matrix *omSum(int nooutput, int noargs, Matrix **matrices){
       }
 
 	m->syncToDevice();
+    m->setInitialized(true);
 	return m;
 }
 
 Matrix *omProd(int nooutput, int noargs, Matrix **matrices){
-	if(noargs != 1)
-			throw ExeException("prod accepts 1 argument.\n");
+	if(noargs != 1 && noargs !=2 )
+			throw ExeException("prod accepts 1 or 2 argument(s).\n");
 	int dim1 = matrices[0]->getDimAt(0);
 	int dim2 = matrices[0]->getDimAt(1);
     Matrix *m;
 
 	// code goes here
-    if (dim1 == 1 || dim2 == 1) // if it is a vector
+    if (noargs == 1) // only one argument is provided:
       {
-        m = new Matrix(NULL, 2, 1, 1);  //  the result is a vector
-        OM_SUPPORT_TYPE total = 1.0;
-        OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
-        for (int i = 0; i != matrices[0]->getBufferSize(); i++)
-          total *= *element++;
-        m->setScalaValue(total);
-      }
-    else
-      {
-        OM_SUPPORT_TYPE total[dim2];
-        for (int i = 0; i != dim2; i++)
+        if (dim1 == 1 || dim2 == 1) // if it is a vector
           {
-            total[i] = 1.0;
-            for (int j = 0; j != dim1; j++)
+            m = new Matrix(NULL, 2, 1, 1);  //  the result is a vector
+            OM_SUPPORT_TYPE total = 1.0;
+            OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
+            for (int i = 0; i != matrices[0]->getBufferSize(); i++)
+              total *= *element++;
+            m->setScalaValue(total);
+          }
+        else
+          {
+            OM_SUPPORT_TYPE total[dim2];
+            for (int i = 0; i != dim2; i++)
               {
-                total[i] *= matrices[0]->getElementAt(j,i);
+                total[i] = 1.0;
+                for (int j = 0; j != dim1; j++)
+                  {
+                    total[i] *= matrices[0]->getElementAt(j,i);
+                  }
+              }
+            int dims[2]; dims[0] = 1; dims[1] = dim2;
+            m = new Matrix(NULL, 2, dims, total);
+          }
+      }
+    else  // two argument 
+      {
+        int DIM = matrices[1]->getScalaValue();
+        if (DIM == 2) // row-wise product
+          {
+            m = new Matrix(NULL, 2, dim1, 1);
+            for (int i = 0; i != dim1; i++)
+              {
+                OM_SUPPORT_TYPE total(1.0);
+                for (int j = 0; j != dim2; j++)
+                  total *= matrices[0]->getElementAt(i, j);
+                m->setElementAt(i, 0, total);
               }
           }
-        int dims[2]; dims[0] = 1; dims[1] = dim2;
-        m = new Matrix(NULL, 2, dims, total);
+        else
+         {
+            m = new Matrix(NULL, 2, 1, dim2);
+            for (int i = 0; i != dim2; i++)
+              {
+                OM_SUPPORT_TYPE total(1.0);
+                for (int j = 0; j != dim1; j++)
+                  total *= matrices[0]->getElementAt(j, i);
+                m->setElementAt(0, i, total);
+              }
+         }
       }
 
 	m->syncToDevice();
+    m->setInitialized(true);
 	return m;
 
 }
 
 
+Matrix *omSMin(int nooutput, int noargs, Matrix **matrices){
+	if(noargs != 1 && noargs != 2)
+      throw ExeException("min accepts 1 or 2 argument(s).\n");
+    
+    Matrix *m;
+    if (noargs == 1)
+      {
+        int dim1 = matrices[0]->getDimAt(0);
+        int dim2 = matrices[0]->getDimAt(1);
+        Matrix *m;
+        
+        // code goes here
+        if (dim1 == 1 || dim2 == 1) // if it is a vector
+          {
+            m = new Matrix(NULL, 2, 1, 1);  //  the result is a vector
+            OM_SUPPORT_TYPE total = 1.0;
+            OM_SUPPORT_TYPE *element = matrices[0]->getInternalBuffer();
+            for (int i = 0; i != matrices[0]->getBufferSize(); i++)
+              total *= *element++;
+            m->setScalaValue(total);
+          }
+        else
+          {
+            OM_SUPPORT_TYPE total[dim2];
+            for (int i = 0; i != dim2; i++)
+              {
+                total[i] = 1.0;
+                for (int j = 0; j != dim1; j++)
+                  {
+                    total[i] *= matrices[0]->getElementAt(j,i);
+                  }
+              }
+            int dims[2]; dims[0] = 1; dims[1] = dim2;
+            m = new Matrix(NULL, 2, dims, total);
+          }
+        
+        m->syncToDevice();
+        m->setInitialized(true);
+      }
+	return m;
 
-
-
+}
 
 
 
@@ -580,6 +670,7 @@ Matrix *omOnes(int nooutput, int noargs, Matrix **matrices){
 		}
 
 		m->syncToDevice();
+        m->setInitialized(true);
 		return m;
 
 }
@@ -600,10 +691,10 @@ Matrix *omZeros(int nooutput, int noargs, Matrix **matrices){
 
 		Matrix *m = new Matrix(NULL, 2, dim1, dim2);
 		m->syncToDevice();
+        m->setInitialized(true);
 		return m;
 
 }
-
 
 
 

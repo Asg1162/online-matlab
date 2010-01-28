@@ -44,6 +44,10 @@ namespace ONLINE_MATLAB {
  Matrix *omSum(int nooutput, int noargs, Matrix **);
  Matrix *omProd(int nooutput, int noargs, Matrix **);
 
+ Matrix *omSMin(int nooutput, int noargs, Matrix **);
+ Matrix *omSMax(int nooutput, int noargs, Matrix **);
+
+
  Matrix *omSgerand(int nooutput, int noargs, Matrix **);
 
  Matrix *omSgesvd(int nooutput, int noargs, Matrix **);
