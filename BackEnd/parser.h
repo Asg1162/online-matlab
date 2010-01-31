@@ -10,7 +10,8 @@ typedef enum { typeCon,
                typeId, 
                typeOpr, 
                typeFun, 
-               typeArg
+               typeArg,
+               typeIndexRange
 } nodeEnum;
 
 typedef float OM_SUPPORT_TYPE;
@@ -56,6 +57,13 @@ typedef struct argNodeTypeTag{
   //void *next;
 } argNodeType;
 
+typedef struct indexRangeNodeTypeTag{
+  bool free; // is it only ":"?
+  OM_SUPPORT_TYPE start;
+  OM_SUPPORT_TYPE end;
+  OM_SUPPORT_TYPE step;
+} indexRangeNodeType;
+
 typedef struct nodeTypeTag {
     nodeEnum type;              /* type of node */
 
@@ -69,6 +77,7 @@ typedef struct nodeTypeTag {
   oprNodeType opr;        /* operators */
       funNodeType fun;
       argNodeType arg;
+      indexRangeNodeType index;
     };
 } nodeType;
 

@@ -18,6 +18,7 @@ nodeType *id(char *i);
 nodeType *con(OM_SUPPORT_TYPE value);
 nodeType *matrix(char *m);
 nodeType *matrix_list(char *m);
+nodeType *index_range(char *m);
  nodeType *func(const char *fun, nodeType *firstArg);
  nodeType *arg(nodeType *node);
 
@@ -45,8 +46,8 @@ extern Matlab *gMatlab;
   char *matrix;
   char *matrix_list;
   char *varName;                /* symbol table index */
-    nodeType *nPtr;             /* node pointer */
-  char *
+  nodeType *nPtr;             /* node pointer */
+  char *index_range;
 
 };
 
@@ -54,11 +55,12 @@ extern Matlab *gMatlab;
 %token <matrix> MATRIX
 %token <matrix_list> MATRIX_LIST
 %token <varName> VARIABLE
-%token <indexRange> INDEX_RANGE
+%token <index_range> INDEX_RANGE
 
  //%token <nPtr> NUMBER VARIABLE 
 %token COMMA
 
+ /* %expect 6 */
  /*
 %token WHILE IF PRINT
 %nonassoc IFX
@@ -202,6 +204,10 @@ expr:
           $$ = func($1, $3);
           g_arguments = 0;
           } // function
+        | INDEX_RANGE {
+          $$ = index_range($1);
+          free($1);
+          }
         | NUMBER      { 
             $$ = con($1); 
           }
@@ -402,6 +408,62 @@ nodeType *matrix_list(char *m){
   return p;
 }
 
+nodeType *index_range(char *m)
+{
+  /* allocate node */
+  nodeType *p  = allocateNode(sizeof(nodeType), typeIndexRange);
+
+  /* copy information */
+
+  /* parsing the index_rangexs */
+  // 1. find the number of ":"
+  int numSemiColon = 0;
+  for (int i = 0; i != strlen(m); i++)
+    if (m[i] == ':') numSemiColon++;
+
+  if (numSemiColon == 1)
+    p->index.step = 1.0; // step is by default 1.0
+  
+  // find the numbers before the first ":"
+  regmatch_t pmatch[1];
+  regex_t  *numbers = (regex_t *)malloc(sizeof(regex_t));
+  int ret = regcomp(numbers, "[-+]?[0-9]*\\.?[0-9]+", REG_EXTENDED);
+
+  char *strToRead = m;
+  int numNumbers = 0;
+  OM_SUPPORT_TYPE fnumbers[3];
+  while(1)
+    {
+      int result = regexec(numbers, strToRead, 1, pmatch, 0);
+      if((result != 0) || (pmatch[0].rm_so == -1))
+        break;
+      int len = pmatch[0].rm_eo - pmatch[0].rm_so ;
+      char number[len+1];
+      memcpy(number, &strToRead[pmatch[0].rm_so], len);
+      number[len] = '\0';
+      fnumbers[numNumbers] = atof(number);
+      strToRead += pmatch[0].rm_eo;
+      numNumbers++;
+    }
+
+  if (numNumbers == 2)
+    {
+      p->index.step = 1.0; // step is by default 1.0
+      p->index.start = fnumbers[0];
+      p->index.end = fnumbers[1];
+    }
+  else if (numNumbers == 3)
+    {
+      p->index.start = fnumbers[0];
+      p->index.step = fnumbers[1];
+      p->index.end = fnumbers[2];
+    }
+  else
+    assert(0); // todo supporting only ":"
+
+  return p;
+}
+
 nodeType *id(char *i) {
 
     /* allocate node */
@@ -530,6 +592,10 @@ void freeNode(nodeType *p) {
     case typeArg:
       freeNode(p->arg.arg);
       break;
+    case typeIndexRange:
+      if (p->myMatrix)
+        delete (Matrix *)(p->myMatrix);
+      break;
     default:
       assert(0);
     }
@@ -655,6 +721,19 @@ Matrix *execute(nodeType *p) {
               firstArg = firstArg->arg.next;
             }
           p->myMatrix = (Matrix *)gMatlab->getUser(gCurUser)->runFunction(p->fun.func, p->fun.nortns, p->fun.noargs, &(ms[0])); //, matrix);
+          return (Matrix *)p->myMatrix;
+        }
+      case typeIndexRange:
+        {
+          int dim[2];
+          dim[0] = 1;
+          dim[1] = (int)((p->index.end - p->index.start + 0.00001)/p->index.step + 1);
+          OM_SUPPORT_TYPE elements[dim[1]];
+          elements[0] =  p->index.start;
+          for (int i = 1; i < dim[1]; i++)
+            elements[i] = elements[i-1] + p->index.step;
+
+          p->myMatrix = (void *)new Matrix(NULL, 2, dim, &elements[0]);
           return (Matrix *)p->myMatrix;
         }
 
