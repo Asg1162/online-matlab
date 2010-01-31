@@ -47,7 +47,7 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
                 return NUMBER;
              }
 {index_range}  {
-                yylval.nuValue = atof(yytext);
+                yylval.index_range = strdup(yytext);
                 return INDEX_RANGE;
  
              }
