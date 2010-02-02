@@ -8,6 +8,7 @@
 #include "include/Matlab.h"
 #include "include/Matrix.h"
 #include "include/ParseException.h"
+#include "include/ExeException.h"
 #include <regex.h>
 #include <sstream>
 
@@ -307,11 +308,11 @@ nodeType *matrix(char *m){
   //    p->vec.dims[0] = numCol;
   //  else
     {
-      p->vec.dims[0] = numRows;      
-      p->vec.dims[1] = numCol;
+      p->vec.dims[0] = numCol;
+      p->vec.dims[1] = numRows; 
     }
 
-  p->vec.elements = (OM_SUPPORT_TYPE *)calloc(totalNum, sizeof(double));
+  p->vec.elements = (OM_SUPPORT_TYPE *)calloc(totalNum, sizeof(OM_SUPPORT_TYPE));
   OM_SUPPORT_TYPE *element = p->vec.elements;
 
   strToRead = m;
@@ -413,6 +414,7 @@ nodeType *index_range(char *m)
   /* allocate node */
   nodeType *p  = allocateNode(sizeof(nodeType), typeIndexRange);
 
+  p->index.free = false;
   /* copy information */
 
   /* parsing the index_rangexs */
@@ -456,11 +458,16 @@ nodeType *index_range(char *m)
     {
       p->index.start = fnumbers[0];
       p->index.step = fnumbers[1];
+      if (p->index.step == 0.0f)
+        throw ExeException("step size can't be zero.");
       p->index.end = fnumbers[2];
     }
   else
-    assert(0); // todo supporting only ":"
+    {
+      p->index.free = true;  // only one semi colon is found. it is a free matrix, depending on its parent's dimension
+    }
 
+  free(numbers);
   return p;
 }
 
@@ -631,9 +638,9 @@ Matrix *execute(nodeType *p) {
         }
       case typeVec:
         {
-          string tmp("tmp");
-          Matrix *m = new Matrix(tmp.c_str(), p->vec.dim, p->vec.dims, p->vec.elements);
+          Matrix *m = new Matrix(NULL, p->vec.dim, p->vec.dims, p->vec.elements);
           p->myMatrix = (void *)m;  // save it, for free in future
+          //          delete m;
           return m;
         }
       case typeId:
@@ -650,10 +657,11 @@ Matrix *execute(nodeType *p) {
            if (noRtns == 1)
              {
                Matrix *rtn =  execute(p->opr.op[1]);
-               gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, rtn);
-               p->opr.op[0]->myMatrix = 0; // set to 0 in order not to free memory
+               int found = gMatlab->getUser(gCurUser)->updateVar(p->opr.op[0]->id.id, rtn);
+               p->opr.op[0]->myMatrix = 0;
+
+               p->opr.op[1]->myMatrix = 0; // set to 0 in order not to free memory
                //   if (p->opr.op[1]->type == typeVec || p->opr.op[1]->type == typeCon)
-               p->opr.op[1]->myMatrix = 0;
                return rtn;
              }
            else if (noRtns > 1) 
@@ -716,8 +724,13 @@ Matrix *execute(nodeType *p) {
           for (int i = 0; i < p->fun.noargs; ++i)
             {
               // reverse the order
-              ms[p->fun.noargs-i-1] = execute(firstArg);
+              if (firstArg->arg.arg->type == typeIndexRange)
+                {
+                  firstArg->arg.arg->index.parent = p; // set its parent
+                  firstArg->arg.arg->index.argIdx = p->fun.noargs - i - 1; 
+                }
               assert(firstArg->type == typeArg);
+              ms[p->fun.noargs-i-1] = execute(firstArg);
               firstArg = firstArg->arg.next;
             }
           p->myMatrix = (Matrix *)gMatlab->getUser(gCurUser)->runFunction(p->fun.func, p->fun.nortns, p->fun.noargs, &(ms[0])); //, matrix);
@@ -725,16 +738,48 @@ Matrix *execute(nodeType *p) {
         }
       case typeIndexRange:
         {
-          int dim[2];
-          dim[0] = 1;
-          dim[1] = (int)((p->index.end - p->index.start + 0.00001)/p->index.step + 1);
-          OM_SUPPORT_TYPE elements[dim[1]];
-          elements[0] =  p->index.start;
-          for (int i = 1; i < dim[1]; i++)
-            elements[i] = elements[i-1] + p->index.step;
-
-          p->myMatrix = (void *)new Matrix(NULL, 2, dim, &elements[0]);
-          return (Matrix *)p->myMatrix;
+          if (!p->index.free)
+            {
+              int dim[2];
+              dim[0] = 1;
+              dim[1] = (int)((p->index.end - p->index.start + p->index.step/2)/p->index.step + 1);
+              if (dim[1] < 0)
+                throw ExeException("Matrix index setup error.");
+              OM_SUPPORT_TYPE elements[dim[1]];
+              elements[0] =  p->index.start;
+              for (int i = 1; i < dim[1]; i++)
+                elements[i] = elements[i-1] + p->index.step;
+              
+              const OM_SUPPORT_TYPE *ele = elements;
+              p->myMatrix = (void *)new Matrix(NULL, 2, dim, ele);
+              return (Matrix *)p->myMatrix;
+            }
+          else // else it is just ":", need to consult its parent
+            {
+              char *varName = p->index.parent->fun.func;
+              Matrix *pMatrix = gMatlab->getUser(gCurUser)->getVar(varName);
+              if (pMatrix == 0)
+                {
+                  std::string error("can't find variable ");
+                  std::string var(varName);
+                  throw ExeException(error+var);
+                }
+              short index = p->index.argIdx;
+              int dim = pMatrix->getDimAt(index);
+              if (dim != 0)
+                {
+                  OM_SUPPORT_TYPE elements[dim];
+                  for (int i = 0; i != dim; i++)
+                    elements[i] = (OM_SUPPORT_TYPE)(i + 1);
+                  const OM_SUPPORT_TYPE *ele = elements;
+                  int dims[2];
+                  dims[0] = 1; dims[1] = dim;
+                  p->myMatrix = new Matrix(NULL, 2, dims, ele);
+                  return (Matrix *)p->myMatrix;
+                }
+              else // out of range
+                return NULL;
+            }
         }
 
       default:

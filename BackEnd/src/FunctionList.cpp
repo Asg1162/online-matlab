@@ -630,7 +630,8 @@ Matrix *omSMin(int nooutput, int noargs, Matrix **matrices){
                   }
               }
             int dims[2]; dims[0] = 1; dims[1] = dim2;
-            m = new Matrix(NULL, 2, dims, total);
+            const OM_SUPPORT_TYPE *t = total;
+            m = new Matrix(NULL, 2, dims, t);
           }
         
         m->syncToDevice();

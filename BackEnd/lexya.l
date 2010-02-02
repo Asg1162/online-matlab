@@ -4,7 +4,7 @@ space	[ \t\n]+
 space1	[ \t\n]
 row	{space}?{numeric}({space}{numeric})*{space}?
 matrix_item  [ ]*{word}[ ]*
-index_range {numeric}?{space}?:({space}?{numeric}:)?{numeric}?
+index_range {numeric}?{space}?:({space}?{numeric}{space}?:)?({space}?{numeric})?
 
 %{
 #include <stdlib.h>

@@ -19,7 +19,8 @@ public:
   void newVar(const char *var);
   Matrix *getVar(const char *varName);
   int getSize();
-  void updateVar(const char* varName, Matrix *newVal);
+  // bool returns whether the variable exists before or not
+  bool updateVar(const char* varName, Matrix *newVal);
 
   Matrix *runFunction(char *funcName, int nooutput, int noargs, Matrix **matrix);
   const int getNumInstances() const 
