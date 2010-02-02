@@ -58,10 +58,12 @@ typedef struct argNodeTypeTag{
 } argNodeType;
 
 typedef struct indexRangeNodeTypeTag{
-  bool free; // is it only ":"?
+  struct nodeTypeTag *parent;
   OM_SUPPORT_TYPE start;
   OM_SUPPORT_TYPE end;
   OM_SUPPORT_TYPE step;
+  bool free; // is it only ":"?
+  short argIdx;
 } indexRangeNodeType;
 
 typedef struct nodeTypeTag {

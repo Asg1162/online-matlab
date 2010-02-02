@@ -11,16 +11,18 @@ class Atom {
 public:
   explicit  Atom(int dim);
   Atom(int dim, int *dims);
-  Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements);
+  Atom(int dim, int *dims, const OM_SUPPORT_TYPE *elements);
   ~Atom();
 
   void setDim(int dim, ...);
   void setDims(int dim, int *);
   //int getDim();
   int getDim() const { return mDim;}
-  int getDimAt(int i) const { assert(i <= mDim);
+  int getDimAt(int i) const 
+  { 
+    if(i > mDim) return 0;
     return mDLen[i];
-} 
+  } 
   int getLength(){
       return mDLen.size();
   }

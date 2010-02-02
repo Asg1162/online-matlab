@@ -9,7 +9,7 @@ class Matrix : public Atom {
   public:
     //    Matrix();
     Matrix(const char *name, int dim, ...);
-    Matrix(const char *name, int dim, int *dims, OM_SUPPORT_TYPE *elements);
+    Matrix(const char *name, int dim, int *dims, const OM_SUPPORT_TYPE * elements);
 
 
   //    Matrix();
@@ -23,6 +23,9 @@ class Matrix : public Atom {
     Matrix *operator*(Matrix const &rhs) const;
 
     Matrix *transpose();
+
+    Matrix *clone();
+
 
     Matrix *getNext() const
     {

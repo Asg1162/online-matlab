@@ -55,7 +55,10 @@ int main(int argc, char **argv)
   //yy_flex_debug = 1;
   std::string output;
 
-  runtest("-1:1", output, username);
+  runtest("a= [11 12; 21 22]", output, username);
+  runtest("a", output, username);
+
+  //  runtest("a = -0.5:0.5:4", output, username);
  
   //  yyin = stdin; //std::cin; //fopen("input", "r");
   /*      yy_buffer_state *my_string_buffer  = yy_scan_string(input.c_str());

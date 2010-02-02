@@ -29,7 +29,7 @@ using namespace std;
   //  mHostBuffer = (void *)calloc(length, sizeof(OM_SUPPORT_TYPE));
 }
 
-  Matrix :: Matrix(const char *name, int dim, int *dims, OM_SUPPORT_TYPE *elements):
+  Matrix :: Matrix(const char *name, int dim, int *dims, const OM_SUPPORT_TYPE *elements):
   Atom(dim, dims, elements),
     mNext(0),
     mName(name)
@@ -113,6 +113,14 @@ printf("addition1\n");
 
 }
 
+ Matrix *Matrix::clone() 
+   {
+     int dims[getDim()];
+     for (int i = 0; i != getDim(); i++)
+       dims[i] = getDimAt(i);
+     return new Matrix(NULL, getDim(), dims, getInternalBuffer());
+   }
+
 
 Matrix *Matrix :: operator*(Matrix const &rhs) const
 {
@@ -194,5 +202,6 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
    out << "<br>" << endl <<  getName() << " =" << "<br>"  << endl;
    streamAtom(out);
  }
+
 
 } // namespace

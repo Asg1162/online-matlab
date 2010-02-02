@@ -47,7 +47,7 @@ namespace ONLINE_MATLAB{
   */
 }
 
-Atom :: Atom(int dim, int *dims, OM_SUPPORT_TYPE *elements)
+Atom :: Atom(int dim, int *dims, const OM_SUPPORT_TYPE *elements)
 {
 
   mBufSize = 1;

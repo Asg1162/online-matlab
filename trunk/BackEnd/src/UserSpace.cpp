@@ -28,30 +28,40 @@ UserSpace :: ~UserSpace(){
    mVars.insert(std::pair<std::string, Matrix *>(v, 0));
 }
 
- void UserSpace :: updateVar(const char* varName, Matrix *newVal){
+ bool UserSpace :: updateVar(const char* varName, Matrix *newVal){
+   bool exists;
    std::string v(varName);
    if (mVars.find(v) != mVars.end()) // if found
      {
+       exists = true;
        if (mVars[v] != 0)
          delete mVars[v];
-       mVars[v] = newVal;
+
+       if (newVal->getName() == NULL) // if the new value is anonymous
+         mVars[v] = newVal;
+       else  // otherwise clone the matrix
+         mVars[v] = newVal->clone();;
      }
    else
      {
-       mVars.insert(std::pair<std::string, Matrix *>(v, newVal));
+       exists = false;
+       if (newVal->getName() == NULL)  // if anonymous
+         mVars.insert(std::pair<std::string, Matrix *>(v, newVal));
+       else
+         mVars.insert(std::pair<std::string, Matrix *>(v, newVal->clone()));
      }
+
    varIter it = mVars.find(v);
    newVal->updateName((*it).first.c_str());
+   return exists;
  }
 
 
 Matrix* UserSpace :: getVar(const char *varName){
   std::string v(varName);
 
-
   if(mVars.find(v) == mVars.end())
-    printf("trying to get %s failed.\n", varName);
-  assert(mVars.find(v) != mVars.end());
+    return NULL;
 
   return mVars[v];
  }
