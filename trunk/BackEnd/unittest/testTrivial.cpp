@@ -55,8 +55,9 @@ int main(int argc, char **argv)
   //yy_flex_debug = 1;
   std::string output;
 
-  runtest("a= [11 12; 21 22]", output, username);
-  runtest("a", output, username);
+  //  runtest("a= [11 12; 21 22; 31 32]", output, username);
+  //  runtest("a", output, username);
+  runtest("who", output, username);
 
   //  runtest("a = -0.5:0.5:4", output, username);
  
