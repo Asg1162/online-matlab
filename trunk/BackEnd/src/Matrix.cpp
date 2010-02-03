@@ -118,7 +118,10 @@ printf("addition1\n");
      int dims[getDim()];
      for (int i = 0; i != getDim(); i++)
        dims[i] = getDimAt(i);
-     return new Matrix(NULL, getDim(), dims, getInternalBuffer());
+     Matrix *tran = transpose();
+     Matrix *m= Matrix(NULL, getDim(), dims, tran->getInternalBuffer());
+     delete tran;
+     return m;
    }
 
 
