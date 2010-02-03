@@ -68,8 +68,66 @@ namespace ONLINE_MATLAB {
 }
 
 
+Matrix *omSgeeig(int nooutput, int noargs, Matrix **matrices){
+	if (noargs != 1)
+		throw ExeException("Eig accepts one matrix.");
+	if (nooutput != 1 && nooutput != 2 && nooutput != 3)
+		throw ExeException("Eig accepts 1, 2, or 3 output matrices.");
 
-Matrix *omSgetri(int nooutput, int noargs, Matrix **matrices){
+	int n = matrices[0]->getDimAt(0);
+	if(n != matrices[0]->getDimAt(1) )
+		throw ExeException("Input to eig should be a square matrix.");
+
+	Matrix *WR, *WI, *VL, *VR;
+	WR = new Matrix(NULL, 2, n, 1);
+	WI = new Matrix(NULL, 2, n, 1);
+
+	char jobvl, jobvr;
+	culaStatus status;
+	switch(nooutput){
+		case 1:
+				jobvl = 'N';
+				jobvr = 'N';
+				status = culaSgeev(jobvl, jobvr, n, matrices[0]->getInternalBuffer(), n, WR->getInternalBuffer(), WI->getInternalBuffer(), NULL, n, NULL, n);
+				checkStatus(status);
+				break;
+		case 2:
+				jobvl = 'V';
+				jobvr = 'N';
+				VL = new Matrix(NULL, 2, n, n);
+				status = culaSgeev(jobvl, jobvr, n, matrices[0]->getInternalBuffer(), n, WR->getInternalBuffer(), WI->getInternalBuffer(), VL->getInternalBuffer(), n, NULL, n);
+				checkStatus(status);
+				VL->syncToDevice();
+				VL->setInitialized(true);
+				WR->setNext(VL);
+				break;
+		case 3:
+				jobvl = 'V';
+				jobvr = 'V';
+				VL = new Matrix(NULL, 2, n, n);
+				VR = new Matrix(NULL, 2, n, n);
+				status = culaSgeev(jobvl, jobvr, n, matrices[0]->getInternalBuffer(), n, WR->getInternalBuffer(), WI->getInternalBuffer(), VL->getInternalBuffer(), n, VR->getInternalBuffer(), n);
+				checkStatus(status);
+				VL->syncToDevice();
+				VR->syncToDevice();
+				VL->setInitialized(true);
+				VR->setInitialized(true);
+				WR->setNext(VL);
+				VL->setNext(VR);
+				break;
+	}
+
+	WR->syncToDevice();
+	WR->setInitialized(true);
+	//WI->syncToDevice();
+	delete WI;
+
+	return WR;
+
+}
+
+
+Matrix *omSgeinv(int nooutput, int noargs, Matrix **matrices){
 
     if (noargs != 1)
       throw ExeException("Inv supports one matrix.");
