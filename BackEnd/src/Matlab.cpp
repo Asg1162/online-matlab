@@ -60,6 +60,8 @@ Matlab :: Matlab(int gpuId){
   // build the function map
   mFunctions["rand"] = omSgerand;
   mFunctions["svd"] = omSgesvd;
+  mFunctions["inv"] = omSgetri;
+
   mFunctions["plot"] = omPlot;
   mFunctions["hilb"] = omHilb;
   mFunctions["magic"] = omMagic;
