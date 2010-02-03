@@ -119,7 +119,7 @@ printf("addition1\n");
      for (int i = 0; i != getDim(); i++)
        dims[i] = getDimAt(i);
      Matrix *tran = transpose();
-     Matrix *m= Matrix(NULL, getDim(), dims, tran->getInternalBuffer());
+     Matrix *m= new Matrix(NULL, getDim(), dims, tran->getInternalBuffer());
      delete tran;
      return m;
    }

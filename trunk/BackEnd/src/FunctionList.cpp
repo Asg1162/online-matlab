@@ -82,7 +82,7 @@ Matrix *omSgetri(int nooutput, int noargs, Matrix **matrices){
 
 	int ipiv[n];
 	for(int i=1; i<=n; i++){
-		ipiv[i] = i;
+		ipiv[i-1] = i;
 	}
 
 	culaStatus status = culaSgetri(n, A->getInternalBuffer(), n, ipiv);
@@ -90,7 +90,7 @@ Matrix *omSgetri(int nooutput, int noargs, Matrix **matrices){
 	checkStatus(status);
 
 	A->syncToDevice();
-	A->setInitialized(true);
+    A->setInitialized(true);
 			
 	return A;
 }
@@ -125,19 +125,19 @@ Matrix *omSgetri(int nooutput, int noargs, Matrix **matrices){
     if (nooutput == 1)
       {
         delete U;  delete VT;
-		S->syncFromDevice();
+		S->syncToDevice();
         S->setInitialized(true);
         return S;
       }
     else{
       U->setNext(S);
-	  U->syncFromDevice();
+	  U->syncToDevice();
       U->setInitialized(true);
       S->setNext(VT);
-	  S->syncFromDevice();
+	  S->syncToDevice();
       S->setInitialized(true);
       VT->setNext(NULL);
-	  VT->syncFromDevice();
+	  VT->syncToDevice();
       VT->setInitialized(true);      
       return U;
     }
