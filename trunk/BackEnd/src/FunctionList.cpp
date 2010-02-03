@@ -67,6 +67,36 @@ namespace ONLINE_MATLAB {
   return re;
 }
 
+
+
+Matrix *omSgetri(int nooutput, int noargs, Matrix **matrices){
+
+    if (noargs != 1)
+      throw ExeException("Inv supports one matrix.");
+
+	int n = matrices[0]->getDimAt(0);
+	if(n != matrices[0]->getDimAt(1) )
+      throw ExeException("Input to inv should be a square matrix.");
+
+	Matrix *A = matrices[0]->clone();
+
+	int ipiv[n];
+	for(int i=1; i<=n; i++){
+		ipiv[i] = i;
+	}
+
+	culaStatus status = culaSgetri(n, A->getInternalBuffer(), n, ipiv);
+
+	checkStatus(status);
+
+	A->syncToDevice();
+	A->setInitialized(true);
+			
+	return A;
+}
+
+
+
   Matrix *omSgesvd(int nooutput, int noargs, Matrix **matrices)
   {
     assert(nooutput == 1 || nooutput == 3);
