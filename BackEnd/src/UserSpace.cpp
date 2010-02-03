@@ -37,18 +37,25 @@ UserSpace :: ~UserSpace(){
        if (mVars[v] != 0)
          delete mVars[v];
 
-       if (newVal->getName() == NULL) // if the new value is anonymous
+       if (newVal->getName() == 0) // if the new value is anonymous
          mVars[v] = newVal;
        else  // otherwise clone the matrix
-         mVars[v] = newVal->clone();;
+         {
+           mVars[v] = newVal->clone();
+
+           newVal = mVars[v];
+         }
      }
    else
      {
        exists = false;
-       if (newVal->getName() == NULL)  // if anonymous
+       if (newVal->getName() == 0)  // if anonymous
          mVars.insert(std::pair<std::string, Matrix *>(v, newVal));
        else
-         mVars.insert(std::pair<std::string, Matrix *>(v, newVal->clone()));
+         {
+           mVars.insert(std::pair<std::string, Matrix *>(v, newVal->clone()));
+           newVal = mVars[v];
+         }
      }
 
    varIter it = mVars.find(v);
