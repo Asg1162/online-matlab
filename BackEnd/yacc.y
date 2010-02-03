@@ -99,7 +99,7 @@ function stmt         {
     }
   else 
     {
-      if (m->getName() == 0) // if the output is not assigned to anyone
+      if (m && m->getName() == 0) // if the output is not assigned to anyone
         {
           gMatlab->getUser(gCurUser)->updateVar("ans", m);  // set to ans
           //      if ($2->type == typeOpr)
@@ -308,8 +308,8 @@ nodeType *matrix(char *m){
   //    p->vec.dims[0] = numCol;
   //  else
     {
-      p->vec.dims[0] = numCol;
-      p->vec.dims[1] = numRows; 
+      p->vec.dims[0] = numRows; 
+      p->vec.dims[1] = numCol;
     }
 
   p->vec.elements = (OM_SUPPORT_TYPE *)calloc(totalNum, sizeof(OM_SUPPORT_TYPE));
