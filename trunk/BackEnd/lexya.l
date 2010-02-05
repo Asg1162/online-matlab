@@ -54,7 +54,10 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
 {space}    {  
   ;       /* ignore whitespace */
 }
-
+\".*\"     {
+        yylval.string = strdup(yytext);
+        return STRING;
+}
 .               { 
   // printf("unknown character %s.\n", yytext);
   // do not call yyerror, just throw an exception

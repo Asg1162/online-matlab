@@ -9,6 +9,7 @@
 #include "include/Matrix.h"
 #include "include/ParseException.h"
 #include "include/ExeException.h"
+#include "include/PlotPair.h"
 #include <regex.h>
 #include <sstream>
 
@@ -19,6 +20,7 @@ nodeType *id(char *i);
 nodeType *con(OM_SUPPORT_TYPE value);
 nodeType *matrix(char *m);
 nodeType *matrix_list(char *m);
+nodeType *make_string(char *m);
 nodeType *index_range(char *m);
  nodeType *func(const char *fun, nodeType *firstArg);
  nodeType *arg(nodeType *node);
@@ -49,6 +51,7 @@ extern Matlab *gMatlab;
   char *varName;                /* symbol table index */
   nodeType *nPtr;             /* node pointer */
   char *index_range;
+  char *string;
 
 };
 
@@ -57,6 +60,7 @@ extern Matlab *gMatlab;
 %token <matrix_list> MATRIX_LIST
 %token <varName> VARIABLE
 %token <index_range> INDEX_RANGE
+%token <string> STRING
 
  //%token <nPtr> NUMBER VARIABLE 
 %token COMMA
@@ -155,7 +159,6 @@ stmt:
           $$ = opr('=', 2, matrix_list($1), $3);
           gEnableOutput = true;
           }
-
         ;
 
 /*stmt_list:
@@ -212,7 +215,10 @@ expr:
         | NUMBER      { 
             $$ = con($1); 
           }
-
+        | STRING {
+          $$ = make_string($1);
+          free($1); 
+          }
 
 /*      | expr '<' expr         { $$ = opr('<', 2, $1, $3); }
         | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
@@ -334,6 +340,15 @@ nodeType *matrix(char *m){
   free(numeric);
 
 
+  return p;
+}
+
+nodeType *make_string(char *m)
+{
+  /* allocate node */
+  nodeType *p  = allocateNode(sizeof(nodeType), typeString);
+  p->string.string = new char[strlen(m)];
+  strcpy(p->string.string, m);
   return p;
 }
 
@@ -603,6 +618,9 @@ void freeNode(nodeType *p) {
       if (p->myMatrix)
         delete (Matrix *)(p->myMatrix);
       break;
+    case typeString:
+      delete p->string.string;
+      break;
     default:
       assert(0);
     }
@@ -720,24 +738,91 @@ Matrix *execute(nodeType *p) {
         {
           Matrix *ms[p->fun.noargs];
           nodeType *firstArg = p->fun.arglist;
-          
-          for (int i = 0; i < p->fun.noargs; ++i)
+
+          if (strcmp("plot", p->fun.func) == 0)
             {
-              // reverse the order
-              if (firstArg->arg.arg->type == typeIndexRange)
+              if (p->fun.noargs == 0)
+                throw ParseException("Plot can't accept zero argument.");
+
+              nodeType *argArray[p->fun.noargs];
+              vector<PlotPair> pairs;
+
+              Matrix *matrixArray[p->fun.noargs];
+              for (int i = 0; i < p->fun.noargs; ++i)
                 {
-                  firstArg->arg.arg->index.parent = p; // set its parent
-                  firstArg->arg.arg->index.argIdx = p->fun.noargs - i - 1; 
+                  argArray[p->fun.noargs-i-1] = firstArg;
+                  firstArg = firstArg->arg.next;
                 }
-              assert(firstArg->type == typeArg);
-              ms[p->fun.noargs-i-1] = execute(firstArg);
-              firstArg = firstArg->arg.next;
+              
+              int curPointer = 0; int index;
+              for(index= 0; index != p->fun.noargs; ++index)
+                if(argArray[index]->arg.arg->type == typeString)
+                    {
+                      assert(index > curPointer);
+                      // 
+                      if ((index - curPointer) == 1)
+                        {
+                          pairs.push_back(PlotPair(0, matrixArray[curPointer],argArray[index]->arg.arg->string.string));
+                          curPointer+=2;
+                        }
+                      else // 2
+                        {
+                          pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], argArray[index]->arg.arg->string.string));
+                          curPointer+= 3;
+                        }
+                    }
+                  else
+                    {
+                      // TODO 
+                      matrixArray[index] = execute(argArray[index]);
+                      if ((index - curPointer) == 3)
+                        {
+                          pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                          curPointer = index-1;
+                        }
+                    }
+              //
+              if (curPointer < p->fun.noargs) // 
+                {
+                  //
+                  int left = p->fun.noargs - curPointer;
+                  assert(left < 3);
+                  
+                  if ((index - curPointer) == 1)
+                    pairs.push_back(PlotPair(0, matrixArray[curPointer], 0));
+                  else // 2
+                    pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                }
+
+              for (int i = 0; i != pairs.size(); i++)
+                {
+                  // TODO                  pairs[i].dump();
+                }
+              char *todo = new char[20];
+              strcpy(todo, "tmp path");
+              return (Matrix*)(todo);
+
             }
-          p->myMatrix = (Matrix *)gMatlab->getUser(gCurUser)->runFunction(p->fun.func, p->fun.nortns, p->fun.noargs, &(ms[0])); //, matrix);
-          return (Matrix *)p->myMatrix;
+          else
+            {
+              for (int i = 0; i < p->fun.noargs; ++i)
+                {
+                  // reverse the order
+                  if (firstArg->arg.arg->type == typeIndexRange)
+                    {
+                      firstArg->arg.arg->index.parent = p; // set its parent
+                      firstArg->arg.arg->index.argIdx = p->fun.noargs - i - 1; 
+                    }
+                  assert(firstArg->type == typeArg);
+                  ms[p->fun.noargs-i-1] = execute(firstArg);
+                  firstArg = firstArg->arg.next;
+                }
+              p->myMatrix = (Matrix *)gMatlab->getUser(gCurUser)->runFunction(p->fun.func, p->fun.nortns, p->fun.noargs, &(ms[0])); //, matrix);
+              return (Matrix *)p->myMatrix;
+            }
         }
-      case typeIndexRange:
-        {
+        case typeIndexRange:
+          {
           if (!p->index.free)
             {
               int dim[2];
