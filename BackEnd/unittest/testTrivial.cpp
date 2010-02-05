@@ -55,9 +55,8 @@ int main(int argc, char **argv)
   //yy_flex_debug = 1;
   std::string output;
 
-  runtest("a = [11 12; 21 22]", output, username);
-  runtest("b = inv(a)", output, username);
-  runtest("c = a * b", output, username);
+  runtest("a = [1  2 3 4]", output, username);
+  runtest("plot(a, \"format\")", output, username);
   //  runtest("b = inv(a)", output, username);
   //runtest("who", output, username);
 
