@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 {
   gMatlab  = new Matlab(0);
 
-  string username = "xwu";
+  string username = "xwu3";
   gCurUser = username;
   gMatlab->newUser(gCurUser);
 
