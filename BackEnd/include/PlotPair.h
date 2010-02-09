@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "../include/Matrix.h"
 namespace ONLINE_MATLAB{
   using namespace std;
   
@@ -17,12 +18,14 @@ class PlotPair {
     /*    void dump(ifstream &))
     {
     }  */
-
+    const char *writeToFile();
+    int getNbCol() const;
+    std::string getFileName() const { return mFileName; }
  private:
   Matrix *x;
   Matrix *y;
   char *mFormat;
-
+  std::string mFileName;
 };
 
 } // namespace

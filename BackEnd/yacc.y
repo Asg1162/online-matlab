@@ -10,6 +10,7 @@
 #include "include/ParseException.h"
 #include "include/ExeException.h"
 #include "include/PlotPair.h"
+#include "include/OmGnuplot.h"
 #include <regex.h>
 #include <sstream>
 
@@ -745,7 +746,8 @@ Matrix *execute(nodeType *p) {
                 throw ParseException("Plot can't accept zero argument.");
 
               nodeType *argArray[p->fun.noargs];
-              vector<PlotPair> pairs;
+              //              vector<PlotPair> pairs;
+              OmGnuplot gnuplot;
 
               Matrix *matrixArray[p->fun.noargs];
               for (int i = 0; i < p->fun.noargs; ++i)
@@ -762,22 +764,26 @@ Matrix *execute(nodeType *p) {
                       // 
                       if ((index - curPointer) == 1)
                         {
-                          pairs.push_back(PlotPair(0, matrixArray[curPointer],argArray[index]->arg.arg->string.string));
+                          gnuplot.addPair(PlotPair(0, matrixArray[curPointer],argArray[index]->arg.arg->string.string));
                           curPointer+=2;
                         }
                       else // 2
                         {
-                          pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], argArray[index]->arg.arg->string.string));
+                          gnuplot.addPair(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], argArray[index]->arg.arg->string.string));
                           curPointer+= 3;
                         }
                     }
                   else
                     {
-                      // TODO 
+                      if (argArray[index]->arg.arg->type == typeIndexRange)
+                        {
+                          argArray[index]->arg.arg->index.parent = p; // set its parent
+                          argArray[index]->arg.arg->index.argIdx = p->fun.noargs - index - 1; 
+                        }
                       matrixArray[index] = execute(argArray[index]);
                       if ((index - curPointer) == 3)
                         {
-                          pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                          gnuplot.addPair(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
                           curPointer = index-1;
                         }
                     }
@@ -789,18 +795,16 @@ Matrix *execute(nodeType *p) {
                   assert(left < 3);
                   
                   if ((index - curPointer) == 1)
-                    pairs.push_back(PlotPair(0, matrixArray[curPointer], 0));
+                    gnuplot.addPair(PlotPair(0, matrixArray[curPointer], 0));
                   else // 2
-                    pairs.push_back(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                    gnuplot.addPair(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
                 }
 
-              for (int i = 0; i != pairs.size(); i++)
-                {
-                  // TODO                  pairs[i].dump();
-                }
-              char *todo = new char[20];
-              strcpy(todo, "tmp path");
-              return (Matrix*)(todo);
+              gnuplot.run();
+              
+              char *graphfile = new char[strlen(gnuplot.getGraphFileName().c_str())];
+              strcpy(graphfile, gnuplot.getGraphFileName().c_str());
+              return (Matrix*)(graphfile);
 
             }
           else
