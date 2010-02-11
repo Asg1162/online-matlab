@@ -48,6 +48,7 @@ typedef struct {
   int nortns;                     /* number of returns */
     int noargs;                   /* number of operands */
     struct nodeTypeTag *arglist;  /* operands (expandable) */
+    struct nodeTypeTag *cur_arg;  /* operands (expandable) */
 } funNodeType;
 
 /* argument list */

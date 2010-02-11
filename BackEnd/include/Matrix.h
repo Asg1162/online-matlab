@@ -26,7 +26,6 @@ class Matrix : public Atom {
 
     Matrix *clone();
 
-
     Matrix *getNext() const
     {
       return mNext;

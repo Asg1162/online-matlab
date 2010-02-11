@@ -200,6 +200,7 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
    return m;
  }
 
+
  void Matrix::streamOut(stringstream &out)
  {
    out << "<br>" << endl <<  getName() << " =" << "<br>"  << endl;

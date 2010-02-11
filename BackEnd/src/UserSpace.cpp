@@ -3,7 +3,9 @@
 #include "FunctionList.h"
 #include "Matlab.h"
 #include "ExeException.h"
-
+#include "LoadFun.h"
+#include <fstream>
+#include <string>
 namespace ONLINE_MATLAB{
 
 
@@ -152,5 +154,29 @@ int UserSpace :: getSize(){
 
      return result;
    }
+
+
+ Matrix *UserSpace::loadFrom(const char *filename, ...)
+ {
+   ifstream sfile(filename, ios::in);
+   string line;   
+   Matrix *curM;
+   int state = 0;
+   while(getline(sfile, line))
+     {
+       if (isComment(line))
+         {
+           if(containName(line))
+             getName(line);
+         }
+     }
+   sfile.close();
+ }
+
+ void UserSpace::saveMatrixTo(const char *filename, ...)
+ {
+   
+ }
+
 
 }

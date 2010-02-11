@@ -15,6 +15,8 @@ class PlotPair {
    {
    }
 
+    Matrix *getX() const { return x;}
+    Matrix *getY() const { return y;}
     /*    void dump(ifstream &))
     {
     }  */

@@ -22,6 +22,11 @@ public:
   // bool returns whether the variable exists before or not
   bool updateVar(const char* varName, Matrix *newVal);
 
+  // load matrix(es) from file
+  Matrix *loadFrom(const char *filename, ...); 
+
+  void saveMatrixTo(const char *filename, ...);
+
   Matrix *runFunction(char *funcName, int nooutput, int noargs, Matrix **matrix);
   const int getNumInstances() const 
   {
