@@ -37,6 +37,8 @@ extern int yy_flex_debug;
 // int g_arg_list_size = 0;
  nodeType *g_arguments(0);
 
+ std::vector<nodeType *>g_argument_list;
+
 extern Matlab *gMatlab;
  extern std::string gCurUser;
  extern std::stringstream gOutput;
@@ -207,7 +209,8 @@ expr:
          }
         | VARIABLE '(' arg_list ')'  { 
           $$ = func($1, $3);
-          g_arguments = 0;
+          g_argument_list.pop_back();
+          //          g_arguments = 0;
           } // function
         | INDEX_RANGE {
           $$ = index_range($1);
@@ -232,7 +235,9 @@ expr:
 
 arg_list:
 	expr     {
+      g_argument_list.push_back(NULL);
       $$ =  arg($1);
+
     }
     | arg_list ',' expr     { 
       $$ = arg($3);
@@ -529,6 +534,7 @@ nodeType *func(const char *fun, nodeType *firstArg) {
     nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
     p = allocateNode(nodeSize, typeFun);
 
+    p->fun.cur_arg = 0;
     /* copy information */
     p->fun.func = strdup(fun);
     p->fun.nortns = 1; // by default return only one matrix
@@ -553,6 +559,20 @@ nodeType *arg(nodeType *node){
 
     /* copy information */
     p->arg.arg = node;
+    if (g_argument_list.back() == 0)
+      {
+        p->arg.noargs = 1;
+        p->arg.next = 0;
+      }
+    else
+      {
+        p->arg.noargs = g_argument_list.back()->arg.noargs+1;
+        p->arg.next = g_argument_list.back();
+      }
+    g_argument_list.pop_back();
+    g_argument_list.push_back(p);
+
+    /*
     if (g_arguments == NULL)
       {
         p->arg.noargs = 1;
@@ -563,7 +583,7 @@ nodeType *arg(nodeType *node){
         p->arg.noargs = g_arguments->arg.noargs+1;
         p->arg.next = g_arguments;
       }
-    g_arguments = p;
+      g_arguments = p;*/
     return p;
 }
 
@@ -664,7 +684,11 @@ Matrix *execute(nodeType *p) {
         }
       case typeId:
         {
-          return gMatlab->getUser(gCurUser)->getVar(p->id.id);
+          Matrix *var = gMatlab->getUser(gCurUser)->getVar(p->id.id);
+          if (var == 0)
+            throw ExeException("variable not found");
+          else
+            return var;
         }
       case typeOpr:;
          switch(p->opr.oper) {
@@ -792,17 +816,24 @@ Matrix *execute(nodeType *p) {
                 {
                   //
                   int left = p->fun.noargs - curPointer;
-                  assert(left < 3);
+                  assert(left <= 3);
                   
                   if ((index - curPointer) == 1)
                     gnuplot.addPair(PlotPair(0, matrixArray[curPointer], 0));
-                  else // 2
+                  else if ((index - curPointer) == 2)// 2
                     gnuplot.addPair(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                  else // 3
+                    {
+                      gnuplot.addPair(PlotPair(matrixArray[curPointer], matrixArray[curPointer + 1], 0));
+                      gnuplot.addPair(PlotPair(0, matrixArray[curPointer + 2], 0));
+                    }
+
                 }
 
               gnuplot.run();
-              
-              char *graphfile = new char[strlen(gnuplot.getGraphFileName().c_str())];
+              cout << "gnuplot return graph file name " << gnuplot.getGraphFileName() << endl;
+              cout << "strlen ="  << strlen(gnuplot.getGraphFileName().c_str()) << endl;
+              char *graphfile = new char[strlen(gnuplot.getGraphFileName().c_str())+1];
               strcpy(graphfile, gnuplot.getGraphFileName().c_str());
               return (Matrix*)(graphfile);
 

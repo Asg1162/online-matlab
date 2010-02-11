@@ -48,15 +48,16 @@ int main(int argc, char **argv)
 {
   gMatlab  = new Matlab(0);
 
-  string username = "xwu3";
+  string username = "xwu412345678";
   gCurUser = username;
   gMatlab->newUser(gCurUser);
 
   //yy_flex_debug = 1;
   std::string output;
 
-  runtest("a = [1  2 3 4]", output, username);
-  runtest("plot(a, \"format\")", output, username);
+  runtest("a = 0.1:0.1:3.1", output, username);
+  //  runtest("b = 2:1:11", output, username);
+  runtest("plot(a)", output, username);
   //  runtest("b = inv(a)", output, username);
   //runtest("who", output, username);
 

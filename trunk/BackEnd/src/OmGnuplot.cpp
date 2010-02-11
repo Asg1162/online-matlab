@@ -26,27 +26,32 @@ namespace ONLINE_MATLAB{
     // create the final graphic file name
     time_t seconds;
     seconds = time (NULL);
-    stringstream ss;
-    ss << filePath << gCurUser << "/" << gCurUser << "_" << seconds << ".png" ;
-    mGraphFile = ss.str();
+    stringstream ss, ss1;
+    ss1 << gCurUser << "/" << gCurUser << "_" << seconds << ".png";
+    ss << filePath <<  "/" << ss1.str();
+
+    mGraphFile = ss1.str();
     // 
     sfile << "set terminal png " << endl;
-    sfile << "set output \"" << mGraphFile << "\""<<endl;
+    sfile << "set output \"" << ss.str() << "\""<<endl;
+    sfile << "set title \"" <<  "\""<<endl;
     sfile << "plot " ;
     for (int i = 0; i < mPairs.size()-1; i++)
       {
         sfile  << "\'" << mPairs[i].getFileName() << "\' "  ;
 
         if (mPairs[i].getNbCol() == 2)
-          sfile <<  "using 1:2 ," ;
+          sfile <<  "using 1:2 with linespoints title " << "\"" << mPairs[i].getY()->getName() << "\" ," ;
         else
-          sfile <<  " ," ;
+          sfile <<  " with linespoints title " << "\"" << mPairs[i].getY()->getName() << "\"," ;
       }
     // last 
     sfile  << "\'" << mPairs[mPairs.size() - 1].getFileName() << "\' "  ;
 
     if (mPairs[mPairs.size() - 1].getNbCol() == 2)
-      sfile <<  "using 1:2 " ;
+      sfile <<  "using 1:2 with linespoints title " << "\"" << mPairs[mPairs.size() - 1].getY()->getName() << "\" " ;
+    else
+      sfile <<  " with linespoints title " << "\"" <<  mPairs[mPairs.size()-1].getY()->getName() << "\"" ;
 
     sfile << endl;
     sfile.close();
