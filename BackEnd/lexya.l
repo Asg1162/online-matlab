@@ -1,5 +1,5 @@
 numeric [-+]?[0-9]*\.?[0-9]+
-word	[a-zA-Z_]+
+word	[a-zA-Z_]+[a-zA-Z_0-9]*
 space	[ \t\n]+
 space1	[ \t\n]
 row	{space}?{numeric}({space}{numeric})*{space}?
