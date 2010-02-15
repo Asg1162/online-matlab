@@ -56,6 +56,8 @@ namespace ONLINE_MATLAB {
 
  Matrix *omPlot(int nooutput, int noargs, Matrix **matrices);
 
+ Matrix *omLoad(int nooutput, int noargs, Matrix **matrices);
+
     // Matrix *omDgerand(int nooutput, int noargs, Matrix **);
 
 }

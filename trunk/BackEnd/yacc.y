@@ -170,7 +170,6 @@ stmt:
         ;
 */
 
-
 expr:
         MATRIX		{ 
           $$ = matrix($1);   
@@ -901,7 +900,10 @@ Matrix *execute(nodeType *p) {
                 return NULL;
             }
         }
-
+      case typeString:
+          {
+            return (Matrix *)p->string.string;
+          }
       default:
         printf("unknown type %d.\n", p->type);
         assert(0);

@@ -155,22 +155,145 @@ int UserSpace :: getSize(){
      return result;
    }
 
-
+ void finalizeMatrix(vector<OM_SUPPORT_TYPE> &elements)
+   {
+   }
+ 
+ 
  Matrix *UserSpace::loadFrom(const char *filename, ...)
  {
    ifstream sfile(filename, ios::in);
    string line;   
    Matrix *curM;
    int state = 0;
+   string varName;
+   int rows(0), cols(0);
+   vector<OM_SUPPORT_TYPE> elements;
+
+   int curRows(0), curCols(0);
+   int error = 0;
    while(getline(sfile, line))
      {
-       if (isComment(line))
+       if (line.size() == 0) 
+         continue;
+
+       if (state == 0) // expecting a new matrix
          {
-           if(containName(line))
-             getName(line);
+           if (isComment(line))
+             {
+               curRows = 0;
+               curCols = 0;
+               if(containName(line))
+                 {
+                   varName = getName(line);
+                   state = 0;
+                 }
+               else if (isRow(line))
+                 {
+                   rows = getRows(line);
+                   state = 0;
+                 }
+               else if (isCol(line))
+                 {
+                   cols = getCols(line);
+                   state = 0;
+                 }
+             }
+           else
+             {
+               curCols = readDataLine(elements, line);
+               curRows++;
+               if (cols != 0 && cols != curCols)
+                 {
+                   error = 1;
+                   break;
+                 }
+               state = 1;
+             }
+         }
+       else if (state = 1) // in the middle of reading data
+         {          
+           if (isComment(line)) // a new matrix starts
+             {
+               if (curRows > 0)
+                 {
+                   if (rows != 0 && rows != curRows)
+                     {
+                       error = 1;
+                       break;
+                     }
+                   // store the data
+                   int dims[2];
+                   dims[0] = curRows; 
+                   dims[1] = curCols;
+                   const OM_SUPPORT_TYPE *e = &elements[0];
+                   Matrix *m = new Matrix(NULL, 2, dims, e);
+                   if (varName.size() != 0)
+                     updateVar(varName.c_str(), m);
+                   else
+                     assert(0); // todo
+                 }
+               curRows = 0;
+               curCols = 0;
+               varName = "";
+               state = 0;
+               elements.clear();
+               // processing the current line
+               if(containName(line))
+                 {
+                   varName = getName(line);
+                   state = 0;
+                 }
+               else if (isRow(line))
+                 {
+                   rows = getRows(line);
+                   state = 0;
+                 }
+               else if (isCol(line))
+                 {
+                   cols = getCols(line);
+                   state = 0;
+                 }
+
+             }
+           else
+             {
+               // read data
+               curCols = readDataLine(elements, line);
+               curRows++;
+               if (cols != 0 && cols !=  curCols)
+                 throw ExeException("Error loading the file\n");
+
+               state = 1;
+             }
+         }
+     }
+
+   if (state = 1)
+     {
+       if (curRows > 0)
+         {
+           if (rows != 0 && rows != curRows)
+             {
+               error = 1;
+             }
+           else
+             {
+               // store the data
+               int dims[2];
+               dims[0] = curRows; dims[1] = curCols;
+               Matrix *m = new Matrix(NULL, 2, dims, &elements[0]);
+               if (varName.size() != 0)
+                 updateVar(varName.c_str(), m);
+               else
+                 assert(0); // todo
+
+             }
          }
      }
    sfile.close();
+   if (error == 1)
+     throw ExeException("Error loading the file.");
  }
 
  void UserSpace::saveMatrixTo(const char *filename, ...)

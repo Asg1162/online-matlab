@@ -4,8 +4,8 @@
 #include <fstream>
 #include <ctime>
 #include <unistd.h>
-
-#include <stdlib.h>
+#include <sys/stat.h>
+#include <stdio.h>
 
  extern std::string gCurUser;
 namespace ONLINE_MATLAB{
@@ -13,7 +13,7 @@ namespace ONLINE_MATLAB{
   using namespace std;
   
 
-  static char filePath[] = "/home/xwu3/matcloud/mysite/media/users/";
+  char filePath[] = "/home/xwu3/matcloud/mysite/media/users/";
 
 
   void OmGnuplot :: createScript()
@@ -55,6 +55,8 @@ namespace ONLINE_MATLAB{
 
     sfile << endl;
     sfile.close();
+    // remove the script file
+    remove(mScriptFile.c_str() );
   }
 
   void OmGnuplot::launchGnuplot()

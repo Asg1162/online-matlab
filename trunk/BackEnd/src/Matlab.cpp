@@ -86,6 +86,8 @@ Matlab :: Matlab(int gpuId){
   mFunctions["prod"] = omProd;
   mFunctions["min"] = omSMin;
 
+  mFunctions["load"] = omLoad;
+
   pthread_mutex_init(&mUserspaceLock, NULL);
 
   //  start a gpu thread
