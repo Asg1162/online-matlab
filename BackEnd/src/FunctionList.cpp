@@ -1,5 +1,6 @@
 #include "../include/common.h"
 #include "../include/FunctionList.h"
+#include "../include/Matlab.h"
 #include <cstdlib>
 #include "../include/Gpu.h"
 #include "../include/ExeException.h"
@@ -7,10 +8,18 @@
 #include "../../3rdparty/pngwriter-0.5.4/src/pngwriter.h"
 #include <time.h>
 #include <sstream>
+#include <string>
+
+
+
 
 using namespace std;
- extern std::string gCurUser;
+
+extern ONLINE_MATLAB::Matlab *gMatlab;
+extern std::string gCurUser;
+
 namespace ONLINE_MATLAB {
+
 
   Matrix *omHilb(int nooutput, int noargs, Matrix **matrices){
 	//assert(dim>=1);
@@ -53,14 +62,15 @@ namespace ONLINE_MATLAB {
         }
     }
 
-  OM_SUPPORT_TYPE elements[buffersize];
+  OM_SUPPORT_TYPE *elements = new OM_SUPPORT_TYPE[buffersize];
   for (int i = 0; i != buffersize; i++)
     {
       elements[i] = rand()/(OM_SUPPORT_TYPE)RAND_MAX;
     }
 
   Matrix *re  = new Matrix(NULL, noargs, dims, elements);
-    
+  
+  delete [] elements;
   re->setNext(0);
 
   re->syncToDevice();
@@ -783,6 +793,24 @@ Matrix *omZeros(int nooutput, int noargs, Matrix **matrices){
         m->setInitialized(true);
 		return m;
 
+}
+
+ extern char filePath[];
+
+Matrix *omLoad(int nooutput, int noargs, Matrix **matrices){
+  //		if(noargs != 1 && noargs != 2)
+  //			throw ExeException("Hilb accepts 1 or 2 argument(s).\n");
+
+  char *orig = (char *)matrices[0];
+  string filename = string(&orig[1]); //get rid of the first "
+
+  string final = filename.substr(0, filename.size()-1);   
+
+  stringstream matrixFile;
+  matrixFile << filePath << gCurUser << "/" << final ;
+
+  gMatlab->getUser(gCurUser)->loadFrom(matrixFile.str().c_str());
+  return 0;
 }
 
 

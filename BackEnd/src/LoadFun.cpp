@@ -5,10 +5,12 @@
 #include "stdio.h"
 #include "../include/ExeException.h"
 #include "../include/LoadFun.h"
+#include <string.h>
 
 namespace ONLINE_MATLAB{
 
 using namespace std;
+
 
  bool isComment(const std::string &line)
  {
@@ -24,11 +26,16 @@ using namespace std;
    return (found!=string::npos);
  }
 
+ /* bool isData(const std::string &line)
+ {
+   
+ }*/
+
  string getName(const std::string &line)
  {
    string name = "# name: ";
    size_t found=line.find(name);
-   string n = name.substr(found + name.size());
+   string n = line.substr(found + name.size(), line.size());
    return n;
  }
   
@@ -51,7 +58,7 @@ using namespace std;
  {
    string rows = "# rows: ";
    size_t found=line.find(rows);
-   string n = line.substr(found + rows.size()); 
+   string n = line.substr(found + rows.size(), line.size()); 
    int row;
    if (from_string<int>(row, n, std::dec))
      return row;
@@ -64,7 +71,7 @@ using namespace std;
  {
    string columns = "# columns: ";
    size_t found=line.find(columns);
-   string n = line.substr(found + columns.size());   
+   string n = line.substr(found + columns.size(), line.size());   
    int col;
    if (from_string<int>(col, n, std::dec))
      return col;
