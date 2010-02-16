@@ -55,8 +55,6 @@ namespace ONLINE_MATLAB{
 
     sfile << endl;
     sfile.close();
-    // remove the script file
-    remove(mScriptFile.c_str() );
   }
 
   void OmGnuplot::launchGnuplot()
@@ -68,6 +66,9 @@ namespace ONLINE_MATLAB{
     //    command += string("\"");
     cout << command.c_str() << endl;    
     system(command.c_str());
+
+    // remove the script file
+    remove(mScriptFile.c_str() );
   }
 
   

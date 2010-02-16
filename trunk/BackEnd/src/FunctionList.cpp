@@ -136,6 +136,53 @@ Matrix *omSgeeig(int nooutput, int noargs, Matrix **matrices){
 
 }
 
+ Matrix *omSgelu(int nooutput, int noargs, Matrix **matrices)
+ {
+    if (noargs != 1)
+      throw ExeException("lu supports one matrix.");
+
+   if (nooutput > 1)
+      throw ExeException("lu currently supports one  outputs.");
+
+    assert(matrices[0]->getDim() == 2);
+
+    int M = matrices[0]->getDimAt(0);
+    int N = matrices[0]->getDimAt(1);
+
+    Matrix *output = matrices[0]->clone();
+
+    int lda = M;
+
+    printf("Calling culaSgelu\n");
+    // TODO make ipiv a matrix
+	int ipiv[min(M,N)];
+	for(int i=1; i<=min(M,N); i++){
+		ipiv[i-1] = i;
+	}
+    culaStatus status = culaSgetrf(M, N, output->getInternalBuffer(), M,ipiv);
+    checkStatus(status);
+
+    if (nooutput == 1)
+      {
+		output->syncToDevice();
+        output->setInitialized(true);
+        return output;
+      }
+    /*
+    else{
+      U->setNext(S);
+	  U->syncToDevice();
+      U->setInitialized(true);
+      S->setNext(VT);
+	  S->syncToDevice();
+      S->setInitialized(true);
+      VT->setNext(NULL);
+	  VT->syncToDevice();
+      VT->setInitialized(true);      
+      return U;
+      }*/
+   
+ }
 
 Matrix *omSgeinv(int nooutput, int noargs, Matrix **matrices){
 

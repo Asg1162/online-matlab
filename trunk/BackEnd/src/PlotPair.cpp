@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
 
  extern std::string gCurUser;
 namespace ONLINE_MATLAB{
@@ -54,6 +55,12 @@ const char *PlotPair::writeToFile()
   return mFileName.c_str();
   
 }
+
+
+ void PlotPair::removeFile()
+ {
+   remove(mFileName.c_str());   
+ }
 
  int PlotPair::getNbCol() const
  {
