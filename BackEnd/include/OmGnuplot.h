@@ -34,6 +34,12 @@ class OmGnuplot {
         mPairs[i].writeToFile();  // get the file name 
     }
 
+    void removeDataFile()
+    {
+      for (int i = 0; i != mPairs.size(); i++)
+        mPairs[i].removeFile();  // get the file name 
+    }
+
     void createScript();
     void launchGnuplot();
 

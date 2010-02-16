@@ -23,6 +23,8 @@ class PlotPair {
     const char *writeToFile();
     int getNbCol() const;
     std::string getFileName() const { return mFileName; }
+
+    void removeFile();
  private:
   Matrix *x;
   Matrix *y;

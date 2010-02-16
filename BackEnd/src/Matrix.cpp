@@ -204,7 +204,10 @@ Matrix *Matrix :: operator*(Matrix const &rhs) const
  void Matrix::streamOut(stringstream &out)
  {
    out << "<br>" << endl <<  getName() << " =" << "<br>"  << endl;
-   streamAtom(out);
+   if (getBufferSize() > 1024)
+     out << "matrix too large to display, please try save."<< endl;
+   else
+     streamAtom(out);
  }
 
 
