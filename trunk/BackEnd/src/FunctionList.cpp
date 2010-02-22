@@ -184,6 +184,36 @@ Matrix *omSgeeig(int nooutput, int noargs, Matrix **matrices){
    
  }
 
+
+Matrix *omSgesv(int nooutput, int noargs, Matrix **matrices){
+	
+    if (noargs != 2)
+      throw ExeException("Inv supports one matrix.");
+
+	int n = matrices[0]->getDimAt(0);
+	if(n != matrices[0]->getDimAt(1) )
+      throw ExeException("Input to inv should be a square matrix.");
+
+	Matrix *A = matrices[0]->clone();
+	Matrix *B = matrices[1]->clone();
+
+	int ipiv[n];
+	for(int i=1; i<=n; i++){
+		ipiv[i-1] = i;
+	}
+
+	culaStatus status = culaSgesv(n, B->getDimAt(1), A->getInternalBuffer(), n, ipiv, B->getInternalBuffer(), n);
+
+	checkStatus(status);
+
+	B->syncToDevice();
+    B->setInitialized(true);
+	delete A;
+			
+	return B;
+}
+
+
 Matrix *omSgeinv(int nooutput, int noargs, Matrix **matrices){
 
     if (noargs != 1)

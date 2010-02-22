@@ -68,6 +68,7 @@ Matlab :: Matlab(int gpuId){
   mFunctions["inv"] = omSgeinv;
   mFunctions["eig"] = omSgeeig;
   mFunctions["lu"] = omSgelu;
+  mFunctions["gesv"] = omSgesv;
 
   mFunctions["plot"] = omPlot;
   mFunctions["hilb"] = omHilb;
