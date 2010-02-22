@@ -192,7 +192,7 @@ Matrix *omSgesv(int nooutput, int noargs, Matrix **matrices){
 
 	int n = matrices[0]->getDimAt(0);
 	if(n != matrices[0]->getDimAt(1) )
-      throw ExeExceptson("First input to gesv should be a square matrix.");
+      throw ExeException("First input to gesv should be a square matrix.");
 
 	if ( matrices[1]->getDimAt(0) != n )
       throw ExeException("Dimension mismatch.");
