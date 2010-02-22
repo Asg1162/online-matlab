@@ -188,11 +188,14 @@ Matrix *omSgeeig(int nooutput, int noargs, Matrix **matrices){
 Matrix *omSgesv(int nooutput, int noargs, Matrix **matrices){
 	
     if (noargs != 2)
-      throw ExeException("Inv supports one matrix.");
+      throw ExeException("Gesv supports two matrix.");
 
 	int n = matrices[0]->getDimAt(0);
 	if(n != matrices[0]->getDimAt(1) )
-      throw ExeException("Input to inv should be a square matrix.");
+      throw ExeExceptson("First input to gesv should be a square matrix.");
+
+	if ( matrices[1]->getDimAt(0) != n )
+      throw ExeException("Dimension mismatch.");
 
 	Matrix *A = matrices[0]->clone();
 	Matrix *B = matrices[1]->clone();
