@@ -184,6 +184,26 @@ Matrix *omSgeeig(int nooutput, int noargs, Matrix **matrices){
    
  }
 
+Matrix *omSgeqrf(int nooutput, int noargs, Matrix **matrices){
+	
+    if (noargs != 1)
+      throw ExeException("Qr supports one matrix.");
+
+	
+	Matrix *A = matrices[0]->clone();
+    Matrix *B = new Matrix(NULL, 2, A->getDimAt(0) <= A->getDimAt(1) ? A->getDimAt(0) : A->getDimAt(1), 1);
+	
+	culaStatus status = culaSgeqrf(A->getDimAt(0), A->getDimAt(1),  A->getInternalBuffer(), A->getDimAt(0), B->getInternalBuffer());
+
+	checkStatus(status);
+
+	A->setDimAt(0, A->getDimAt(0) <= A->getDimAt(1) ? A->getDimAt(0) : A->getDimAt(1));
+	A->syncToDevice();
+    A->setInitialized(true);
+	delete B;
+			
+	return A;
+}
 
 Matrix *omSgesv(int nooutput, int noargs, Matrix **matrices){
 	
