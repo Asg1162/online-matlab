@@ -194,22 +194,28 @@ Matrix *omSgeinv(int nooutput, int noargs, Matrix **matrices){
       throw ExeException("Input to inv should be a square matrix.");
 
 	Matrix *A = matrices[0]->clone();
-
 	int ipiv[n];
 	for(int i=1; i<=n; i++){
 		ipiv[i-1] = i;
 	}
 
-	culaStatus status = culaSgetri(n, A->getInternalBuffer(), n, ipiv);
+    Matrix *rank = new Matrix(NULL, 2, 1, 1);
+    rank->setScalaValue(n);
 
-	checkStatus(status);
+    Matrix *eye = omEye(1, 1, &rank);
 
-	A->syncToDevice();
-    A->setInitialized(true);
+    //    culaStatus status = culaSgetri(n, A->getInternalBuffer(), n, ipiv);
+    culaStatus status = culaSgesv(n, n, A->getInternalBuffer(), n, ipiv, eye->getInternalBuffer(), n);
+
+  	checkStatus(status);
+
+    delete A;
+    delete rank;
+    eye->syncToDevice();
+    eye->setInitialized(true);
 			
-	return A;
+	return eye;
 }
-
 
 
   Matrix *omSgesvd(int nooutput, int noargs, Matrix **matrices)

@@ -48,6 +48,11 @@ extern "C" void
           }
         if (done) break;
         gpuQueue->lock();
+        if (gpuQueue->empty_nolock())
+          {
+            gpuQueue->unlock();
+            continue;
+          }
         gpuQueue->wait();
         gpuQueue->unlock();
       }
@@ -88,6 +93,7 @@ Matlab :: Matlab(int gpuId){
   mFunctions["min"] = omSMin;
 
   mFunctions["load"] = omLoad;
+  //  mFunctions["who"] = omWho;
 
   pthread_mutex_init(&mUserspaceLock, NULL);
 

@@ -49,6 +49,12 @@ namespace ONLINE_MATLAB{
       return empty;
     }
 
+    bool empty_nolock()
+    {
+      bool empty = mQueue.empty();
+      return empty;
+    }
+
     void wait()
     {
       pthread_cond_wait(&mQueueSig, &mQueueLock);
