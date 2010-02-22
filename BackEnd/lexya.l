@@ -44,7 +44,7 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
                 return VARIABLE;
              }
 
-[-()<>=+*/;,{}.\'] {
+[-()<>=+*/\\;,{}.\'] {
                 return *yytext;
              }
 

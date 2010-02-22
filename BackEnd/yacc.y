@@ -9,6 +9,7 @@
 #include "include/Matrix.h"
 #include "include/ParseException.h"
 #include "include/ExeException.h"
+#include "include/FunctionList.h"
 #include "include/PlotPair.h"
 #include "include/OmGnuplot.h"
 #include <regex.h>
@@ -76,7 +77,7 @@ extern Matlab *gMatlab;
 
 %left GE LE EQ NE '>' '<'
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '\\'
 %nonassoc UMINUS
 
 %type <nPtr> stmt expr arg_list
@@ -202,6 +203,10 @@ expr:
         | expr '/' expr  { 
           $$ = opr('/', 2, $1, $3); 
           }
+        | expr '\\' expr  { 
+          $$ = opr('\\', 2, $1, $3); 
+          }
+
         | VARIABLE '(' ')'  {
           assert(0);  // TODO
           $$ = func($1, 0);
@@ -736,6 +741,16 @@ Matrix *execute(nodeType *p) {
              p->myMatrix = *(execute(p->opr.op[0])) * (*execute(p->opr.op[1])); // set to 0 in order not to free memory
              return (Matrix *)p->myMatrix;
            }
+         case '\\': 
+           {
+             Matrix *matrices[2];
+             matrices[0] = execute(p->opr.op[0]);
+             matrices[1] = execute(p->opr.op[1]); 
+             p->myMatrix = omSgesv(1, 2, matrices);
+             //             p->myMatrix = *(execute(p->opr.op[0])) * (*execute(p->opr.op[1])); // set to 0 in order not to free memory
+             return (Matrix *)p->myMatrix;
+           }
+
          case '+': 
            {
              p->myMatrix = *(execute(p->opr.op[0])) + (*execute(p->opr.op[1])); // set to 0 in order not to free memory
