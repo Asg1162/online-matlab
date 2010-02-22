@@ -1,5 +1,6 @@
 numeric [-+]?[0-9]*\.?[0-9]+
 word	[a-zA-Z_]+[a-zA-Z_0-9]*
+illegal [0-9]+[a-zA-Z_]+
 space	[ \t\n]+
 space1	[ \t\n]
 row	{space}?{numeric}({space}{numeric})*{space}?
@@ -31,7 +32,12 @@ printf("return matrix-list.\n");  /* %\[{matrix_item}([,|\s]{matrix_item})\s*\] 
                 yylval.matrix = strdup(yytext);
                 return MATRIX_LIST;
         }
-
+{illegal}    {
+					std::string reason("Illegal variable name ");
+				  std::string illegal(yytext);
+				  reason += illegal;
+				  throw LexException(reason);			
+			 }
 
 {word}       { 
                 yylval.varName = strdup(yytext);
