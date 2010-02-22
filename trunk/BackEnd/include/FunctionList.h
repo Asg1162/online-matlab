@@ -55,6 +55,7 @@ namespace ONLINE_MATLAB {
  Matrix *omSgeeig(int nooutput, int noargs, Matrix **);
  Matrix *omSgelu(int nooutput, int noargs, Matrix **);
  Matrix *omSgesv(int nooutput, int noargs, Matrix **);
+ Matrix *omSgeqrf(int nooutput, int noargs, Matrix **);
 
  Matrix *omPlot(int nooutput, int noargs, Matrix **matrices);
 

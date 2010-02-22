@@ -23,6 +23,13 @@ public:
     if(i > mDim) return 0;
     return mDLen[i];
   } 
+
+  void setDimAt(int i, int dim){
+    if(i > mDim) return;
+	mDLen[i] = dim;
+  }
+
+
   int getLength(){
       return mDLen.size();
   }
