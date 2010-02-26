@@ -47,12 +47,12 @@ extern "C" void
             //            delete command;
           }
         if (done) break;
-        gpuQueue->lock();
+        /*        gpuQueue->lock();
         if (gpuQueue->empty_nolock())
           {
             gpuQueue->unlock();
             continue;
-          }
+            }*/
         gpuQueue->wait();
         gpuQueue->unlock();
       }
@@ -69,6 +69,7 @@ Matlab :: Matlab(int gpuId){
   mFunctions["eig"] = omSgeeig;
   mFunctions["lu"] = omSgelu;
   mFunctions["gesv"] = omSgesv;
+  mFunctions["ols"] = omSgeols;
   mFunctions["qr"] = omSgeqrf;
 
   mFunctions["plot"] = omPlot;
