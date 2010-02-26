@@ -270,6 +270,35 @@ Matrix *omSgeinv(int nooutput, int noargs, Matrix **matrices){
 	return eye;
 }
 
+Matrix *omSgeols(int nooutput, int noargs, Matrix **matrices){
+	
+    if (noargs != 2)
+      throw ExeException("ols supports two matrix as input.");
+
+	int m = matrices[0]->getDimAt(0);
+    int n = matrices[0]->getDimAt(1);
+
+    if (m != matrices[1]->getDimAt(0))
+      throw ExeException("incorrect matrix dimensions.");
+    int nrhs = matrices[1]->getDimAt(1);
+
+	Matrix *A = matrices[0]->clone();
+	Matrix *B = matrices[1]->clone();
+
+	culaStatus status = culaSgels('N', m, n, nrhs, A->getInternalBuffer(), m, B->getInternalBuffer(), m);
+
+	checkStatus(status);
+
+    //    the first n rows of B are the results
+    
+	B->syncToDevice();
+    B->setInitialized(true);
+	delete A;
+			
+	return B;
+}
+
+
 
   Matrix *omSgesvd(int nooutput, int noargs, Matrix **matrices)
   {
