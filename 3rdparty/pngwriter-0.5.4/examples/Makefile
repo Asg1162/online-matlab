@@ -43,7 +43,7 @@ EXAMPLES= pngtest lyapunov
 all: $(EXAMPLES)
 
 pngtest: pngtest.cc
-	$(CXX) $(CXXFLAGS) $(INC) pngtest.cc -o pngtest $(LIBS) 
+	$(CXX) $(CXXFLAGS) $(INC) pngtest.cc $(LIBS) -o pngtest 
 
 lyapunov: lyapunov.cc
 	$(CXX) $(CXXFLAGS) $(INC) lyapunov.cc -o lyapunov $(LIBS) 

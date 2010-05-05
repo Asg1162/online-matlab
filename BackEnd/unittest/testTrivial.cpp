@@ -57,14 +57,14 @@ int main(int argc, char **argv)
   char file[] = "\"a.txt\"";
   gMatlab->getUser("xwu3")->loadFrom(&file[0]);
                                     //  runtest("a = 0.1:0.1:3.1", output, username);
-  runtest("a  = rand(3,3)", output, username);
+  runtest("a  = rand(5000,5000)", output, username);
   /*  runtest("a=[2 3 ; 4 5 ; 6 17]", output, username);
   runtest("b=[1 2 3 4;3 4 5 6 ;5 6 7 8]", output, username);
   runtest("c=ols(a, b)", output, username);
 
   runtest("d = a *c", output, username);*/
-  runtest("a=[2 3 4; 5 6 7; 8 9 0]", output, username);
-  runtest("qr(a)", output, username);
+  //  runtest("a=[2 3 4; 5 6 7; 8 9 0]", output, username);
+  //  runtest("qr(a)", output, username);
                                     //  runtest("plot(a)", output, username);
   //  runtest("b = inv(a)", output, username);
   //runtest("who", output, username);
