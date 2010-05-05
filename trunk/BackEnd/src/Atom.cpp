@@ -71,17 +71,18 @@ Atom :: Atom(int dim, int *dims, const OM_SUPPORT_TYPE *elements)
   // if dim = 2, convert from row-wise to column-wise
   if (dim == 2)
     {
-      OM_SUPPORT_TYPE buffer[mDLen[0]][mDLen[1]];
-      OM_SUPPORT_TYPE *bufferd = &buffer[0][0];
+      //      OM_SUPPORT_TYPE buffer[mDLen[0]][mDLen[1]];
+      OM_SUPPORT_TYPE *bufferd = new OM_SUPPORT_TYPE[mDLen[0]*mDLen[1]]; //&buffer[0][0];
       for (int i = 0; i < mBufSize; i++)
         bufferd[i] = elements[i];
       // transpose
       int index = 0;
       for (int i = 0; i < mDLen[1]; i++){
         for (int j = 0; j < mDLen[0]; j++){
-          mHostBuffer[index++] = buffer[j][i];
+          mHostBuffer[index++] = bufferd[j+i*mDLen[0]]; //[j][i];
 		}
 	  }
+      delete [] bufferd;
     }
   else // else use row-wise
     {

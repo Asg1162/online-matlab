@@ -1,0 +1,27 @@
+Enter Matrix size: 1000
+Multiply    0.24876 secs
+LU Decomp   0.13465 secs
+Invert A    0.33876secs
+SDV A 12.867secs 
+QR Decomp 0.69883secs 
+Eigen A 13.975secs 
+DET A 0.12737secs 
+Rank A 1.058 secs 
+Cond A 1.0638 secs 
+Total Time 30.512 secs
+
+*****************************
+Enter Matrix size: 2000
+Multiply    1.9436 secs
+LU Decomp   0.88271 secs
+Invert A    2.4528secs
+SDV A 113.59secs 
+QR Decomp 5.9629secs 
+Eigen A 147.62secs 
+DET A 0.83702secs 
+Rank A 9.8261 secs 
+Cond A 9.6718 secs 
+Total Time 292.79 secs
+
+
+

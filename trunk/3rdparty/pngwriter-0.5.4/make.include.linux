@@ -18,7 +18,7 @@
 # Alternatively, when compiling, call make with the option P_FREETYPE=1
 
 
-PREFIX=/usr/local
+PREFIX=/usr/
 
 DESTDIR=
 
@@ -36,7 +36,7 @@ CXXFLAGS= -O3 -Wall -Wno-deprecated $(FT_ARG)
 
 INC=  -I../src/ -I$(PREFIX)/include/
 
-LIBS= -L../src -L$(PREFIX)/lib/ -lz -lpng -lpngwriter
+LIBS= -L../src -L$(PREFIX)/lib64/ -lz -lpng -lpngwriter
 
 INSTALL=install
 
